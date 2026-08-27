@@ -1,0 +1,15 @@
+# data caches — regenerate from API
+data/raw/*.parquet
+data/processed/*.parquet
+outputs/figures/*.png
+
+# python
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
+# both .py (jupytext source) and .ipynb are tracked
+
+# os / editor
+.DS_Store
+.vscode/
