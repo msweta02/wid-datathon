@@ -28,13 +28,23 @@ def save(fig, name: str, dpi: int = 150) -> Path:
 
 
 def barh_ranking(series: pd.Series, title: str, xlabel: str, n: int = 12,
-                 color: str = "#2a78d6", ax=None):
-    """Horizontal bar chart of the top-n of a ranked Series."""
+                 color: str = "#2a78d6", ax=None, value_fmt: str = "{:,.0f}"):
+    """Horizontal bar chart of the top-n of a ranked Series, labelled with each
+    bar's value so exact numbers don't have to be read off the x-axis."""
     if ax is None:
         fig, ax = plt.subplots(figsize=(9, 5))
     else:
         fig = ax.figure
-    series.head(n)[::-1].plot.barh(color=color, ax=ax)
+    top = series.head(n)[::-1]
+    top.plot.barh(color=color, ax=ax)
+
+    # Push the right edge out a bit so labels have room past the longest bar.
+    xmax = top.max()
+    ax.set_xlim(0, xmax * 1.15 if xmax > 0 else 1)
+    for i, value in enumerate(top.values):
+        ax.text(value + xmax * 0.02, i, value_fmt.format(value),
+               va="center", ha="left", fontsize=9)
+
     ax.set_title(title)
     ax.set_xlabel(xlabel)
     fig.tight_layout()
