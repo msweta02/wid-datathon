@@ -1,0 +1,14 @@
+# data — regenerate from grow-eda/sustain-eda's bulk CSVs (see README)
+data/raw/*.csv
+data/processed/*.parquet
+outputs/figures/*.png
+
+# python
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
+
+# os / editor
+.DS_Store
+.vscode/

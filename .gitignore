@@ -1,0 +1,13 @@
+# working docs / decks — not part of the analysis code
+Docs/
+**/OtherDetails/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
+
+# os / editor
+.DS_Store
+.vscode/
