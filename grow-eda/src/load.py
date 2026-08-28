@@ -134,6 +134,34 @@ def load_dataset(
     return long
 
 
+def load_dataset_range(
+    code: str,
+    start_year: int = 2010,
+    end_year: int = 2024,
+    search_dirs: list[str | Path] | None = None,
+    refresh: bool = False,
+) -> pd.DataFrame:
+    """
+    Load a GROW dataset restricted to [start_year, end_year], cached separately
+    from the full-history cache (does not touch `{code}_long.parquet` or any
+    notebook that calls `load_dataset` directly — purely additive).
+
+    Use this for a "recent years only" analysis (e.g. the Indonesia deep-dive)
+    without invalidating the full 1961-2024 cache the existing 01-08 notebooks
+    already ran against.
+    """
+    cache = PROCESSED / f"{code}_{start_year}_{end_year}.parquet"
+    if cache.exists() and not refresh:
+        print(f"[cache] {cache.name}")
+        return pd.read_parquet(cache)
+
+    full = load_dataset(code, search_dirs=search_dirs, refresh=refresh)
+    ranged = full[(full["year"] >= start_year) & (full["year"] <= end_year)].copy()
+    ranged.to_parquet(cache, index=False)
+    print(f"[range] {code} {start_year}-{end_year}: {len(ranged):,} rows -> {cache.name}")
+    return ranged
+
+
 def load_codes(code: str, kind: str,
                search_dirs: list[str | Path] | None = None) -> pd.DataFrame:
     """

@@ -12,19 +12,27 @@ This track has no bulk downloads of its own. `src/load.py` reads directly from:
 - `../grow-eda/data/raw/Value_of_Production_E_All_Data.csv` (QV)
 - `../sustain-eda/data/raw/Inputs_LandUse_E_All_Data.csv` (RL — Land Use)
 
-melts wide→long, filters to `Area == "Indonesia"`, and caches the small result
-to `data/processed/*.parquet` in **this** track. If any of those sibling CSVs
-are missing, `load_indonesia`/`load_landuse_indonesia` raise/print a clear
+melts wide→long, filters to `Area == "Indonesia"` and year in `[YEAR_MIN,
+YEAR_MAX]` (default **2010-2024** — see `src/load.py`), and caches the small
+result to `data/processed/*.parquet` in **this** track. If any of those sibling
+CSVs are missing, `load_indonesia`/`load_landuse_indonesia` raise/print a clear
 message pointing at where to get them — don't silently fall back to fabricated
 data.
+
+`load_indonesia` prefers grow-eda's own `data/processed/{code}_2010_2024.parquet`
+(from grow-eda's `load_dataset_range`, additive — doesn't touch grow-eda's
+full-history cache or its 01-08 notebooks) when present, and falls back to
+reading+melting the raw CSV directly otherwise, so this track still works
+standalone.
 
 ## Loader — quick reference
 ```python
 from src.load import load_indonesia, load_landuse_indonesia
-qcl = load_indonesia("QCL")   # Area, Item, Element, Unit, year, value, flag
+qcl = load_indonesia("QCL")   # Area, Item, Element, Unit, year, value, flag — 2010-2024 by default
 qi  = load_indonesia("QI")
 qv  = load_indonesia("QV")
-land = load_landuse_indonesia()   # None if sustain-eda's RL CSV isn't present
+land = load_landuse_indonesia()   # None if sustain-eda's RL CSV isn't present; full history
+# override the window: load_indonesia("QCL", year_min=2000, year_max=2024)
 ```
 Column names match grow-eda's raw convention (`Area`, `Item`, `Element`, lowercase
 `year`/`value`/`flag`) — copy-paste between the two tracks works without renames.

@@ -6,9 +6,16 @@ the global GROW overview.
 
 ## Data
 No new downloads needed — reuses the FAOSTAT bulk CSVs already pulled for the
-other tracks, filtered down to Indonesia:
-- **QCL / QI / QV** (production, indices, value) ← `../grow-eda/data/raw/`
+other tracks, filtered down to Indonesia and to **2010–2024** (recent years;
+2024 is the max in the tables):
+- **QCL / QI / QV** (production, indices, value) ← `../grow-eda/data/raw/`,
+  preferring grow-eda's own `load_dataset_range` 2010-2024 cache when present
 - **RL** (Land Use — arable land, for the cropping-intensity proxy) ← `../sustain-eda/data/raw/`
+  (full history; the merge with QCL naturally restricts to 2010-2024)
+
+grow-eda's own notebooks (01-08) are untouched and still run on the full
+1961-2024 history — the 2010-2024 slice is a separate, additive cache
+(`grow-eda/data/processed/{QCL,QI,QV}_2010_2024.parquet`), not a replacement.
 
 Run `grow-eda`'s own `01_data_loading` first (or otherwise make sure
 `grow-eda/data/raw/*_All_Data.csv` exist) — `src/load.py` here reads straight

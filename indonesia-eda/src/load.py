@@ -11,6 +11,11 @@ Bulk files are WIDE (Y1961, Y1961F, ...); this module melts them to LONG and
 caches an Indonesia-only slice to parquet (small + fast — no need to cache the
 full global melt here, grow-eda/sustain-eda already do that for their own use).
 
+Default year range is 2010-2024 (recent years, max in the tables) — set by
+YEAR_MIN/YEAR_MAX below. This reuses grow-eda's `load_dataset_range` (its own
+separate 2010-2024 parquet cache; doesn't touch grow-eda's full-history cache
+or its existing notebooks).
+
 Import from notebooks:  from src.load import load_indonesia, load_landuse_indonesia
 """
 from __future__ import annotations
@@ -28,9 +33,14 @@ PROCESSED.mkdir(parents=True, exist_ok=True)
 
 # Sibling tracks' data/raw — reuse their already-downloaded bulk CSVs.
 GROW_RAW = ROOT.parent / "grow-eda" / "data" / "raw"
+GROW_PROCESSED = ROOT.parent / "grow-eda" / "data" / "processed"
 SUSTAIN_RAW = ROOT.parent / "sustain-eda" / "data" / "raw"
 
 COUNTRY = "Indonesia"
+
+# Default year window — recent years only (2024 is the max in the tables).
+YEAR_MIN = 2010
+YEAR_MAX = 2024
 
 GROW_DATASETS = {
     "QCL": "Crops and livestock products",
@@ -78,28 +88,38 @@ def _melt_wide_to_long(df: pd.DataFrame) -> pd.DataFrame:
     return long.dropna(subset=["value"]).reset_index(drop=True)
 
 
-def load_indonesia(code: str, country: str = COUNTRY, refresh: bool = False) -> pd.DataFrame:
+def load_indonesia(code: str, country: str = COUNTRY, refresh: bool = False,
+                   year_min: int = YEAR_MIN, year_max: int = YEAR_MAX) -> pd.DataFrame:
     """
-    Load one GROW dataset (QCL/QI/QV), filtered to `country`, cached to parquet.
+    Load one GROW dataset (QCL/QI/QV), filtered to `country` and [year_min, year_max],
+    cached to parquet.
 
-    Reads the wide bulk CSV from grow-eda/data/raw/ (falls back to this track's
-    own data/raw/ if you'd rather keep a local copy), melts to long, filters to
-    the country, and caches the small result — so repeat runs are instant without
-    re-melting the full ~4M-row global file.
+    Prefers grow-eda's own `{code}_{year_min}_{year_max}.parquet` (its
+    `load_dataset_range` cache — same underlying data, already year-filtered, no
+    re-melt needed) when present; falls back to reading+melting the raw bulk CSV
+    directly and filtering both country and year range itself otherwise, so this
+    still works standalone if grow-eda hasn't generated that cache yet.
     """
-    cache = PROCESSED / f"{code}_{country.lower()}.parquet"
+    cache = PROCESSED / f"{code}_{country.lower()}_{year_min}_{year_max}.parquet"
     if cache.exists() and not refresh:
         print(f"[cache] {cache.name}")
         return pd.read_parquet(cache)
 
-    basename = BULK_BASENAMES[code]
-    path = _find_bulk_csv(basename, [RAW, GROW_RAW])
-    print(f"[bulk] reading {code} from {path} ...")
-    wide = pd.read_csv(path, encoding=BULK_ENCODING, low_memory=False)
-    long = _melt_wide_to_long(wide)
+    grow_range_cache = GROW_PROCESSED / f"{code}_{year_min}_{year_max}.parquet"
+    if grow_range_cache.exists() and not refresh:
+        print(f"[grow-eda cache] {grow_range_cache.name}")
+        long = pd.read_parquet(grow_range_cache)
+    else:
+        basename = BULK_BASENAMES[code]
+        path = _find_bulk_csv(basename, [RAW, GROW_RAW])
+        print(f"[bulk] reading {code} from {path} ...")
+        wide = pd.read_csv(path, encoding=BULK_ENCODING, low_memory=False)
+        long = _melt_wide_to_long(wide)
+        long = long[(long["year"] >= year_min) & (long["year"] <= year_max)]
+
     sub = long[long["Area"] == country].copy()
     sub.to_parquet(cache, index=False)
-    print(f"[bulk] {country} {code}: {len(sub):,} rows -> {cache.name}")
+    print(f"[bulk] {country} {code} {year_min}-{year_max}: {len(sub):,} rows -> {cache.name}")
     return sub
 
 
