@@ -88,6 +88,11 @@ used in `sustain-eda/src/load.py` for optional datasets) and extend
 - **Oil palm dominates by tonnage** (fresh fruit bunches are heavy) — don't let
   raw production-tonnage rankings overstate its economic/caloric importance
   relative to rice; cross-check against QV (value) and calorie-relevant volume.
+  But **do** use its *area* series: oil palm went 5.78M → 14.32M ha (2010→2024) and that
+  reallocation is the mechanism behind the staple-area decline (nb 07 §2).
+- **Area coincidence ≠ land conversion.** QCL can show total area grew while staples shrank;
+  it cannot show a given cassava field became oil palm. State the former, don't claim the latter —
+  parcel-level proof needs land-cover data (SUSTAIN).
 - Same **flag** and **item-aggregate** (`"Cereals, primary"`, `"Fruit Primary"`, etc.)
   gotchas as grow-eda apply here — `src/clean.py` carries over the relevant helpers.
 - **No trade data in this repo.** QCL/QI/QV/RL are production-side only; FAOSTAT's trade
@@ -97,7 +102,7 @@ used in `sustain-eda/src/load.py` for optional datasets) and extend
   highest-value data addition left for this track.
 
 ## Workflow
-`notebooks/` run in order 01→06:
+`notebooks/` run in order 01→07:
 - 01 load + inventory
 - 02 what it grows (crop mix; rice area-vs-yield: prod −10.4% on −14.8% area, +5.3% yield)
 - 03 when it grows (cropping-intensity proxy 114% in 2015 → 96% in 2024; 2015→2024 area decomposition —
@@ -115,11 +120,19 @@ used in `sustain-eda/src/load.py` for optional datasets) and extend
   swing, the shock-correlation test → quantified diversification benefit, and the
   tradeable-pool framing. Feeds deck slides 3–5.
 
+- 07 land + alternatives (closes the two biggest analytical gaps): **where the staple land went**
+  (total cropped area *grew* 3.75M ha while 6 staples lost 5.04M ha and oil palm gained 8.54M ha —
+  so it's reallocation, not shortage); **is cassava the right lever** (tested against sweet potato,
+  potato, maize, rice — cassava wins by elimination; sago is absent from FAOSTAT); and the
+  **maize→feed-wheat channel** (a second, independent route into wheat imports that MOCAF cannot
+  touch). Ends in the ranked, sized action set for GROW rubric point 3.
+
 Outputs beyond figures: `outputs/tables/slide8_mocaf_blend_matrix.csv` (blend rate ×
 MOCAF conversion → fresh cassava needed, % of current crop, wheat avoided, $ saved,
 % fundable by closing the yield gap) and
 `outputs/tables/supplier_diversification_scenarios.csv` (sourcing mix → supply-pool
-volatility and worst single year).
+volatility and worst single year), and `outputs/tables/grow_action_levers.csv`
+(lever → actor → sized effect).
 
 Note: cassava **area is declining** (−53.2% since 2010) — the proposed solution's own raw
 material is under pressure, and the area already lost is a **4.4× larger lever than the

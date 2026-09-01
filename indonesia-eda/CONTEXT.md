@@ -74,6 +74,36 @@ supply volatility** but cannot reduce the 12.3 Mt Indonesia must buy; cassava->M
 volume but is bounded at an **8-14% blend** land-neutral. Present as two tracks with the volatility
 number on one and the blend band on the other. Neither is sufficient alone.
 
+## Filled findings from notebook 07 — land use + substitute bench (RUN 2026-09-01)
+Closes the two gaps this file previously called the deck's weakest links.
+- **Indonesia is NOT short of cropland.** Total area harvested across all crops **rose 3.75M ha**
+  (34.54M -> 38.28M ha, 2010->2024). The staple decline is a **reallocation, not a shortage** —
+  and reallocations respond to policy in a way shortages do not.
+- **Oil palm took 8.54M ha** (5.78M -> 14.32M, **+148%**) while 6 food staples gave up **5.04M ha**.
+  Oil palm's gain = **1.7x** the staples' combined loss, **13.6x** cassava's entire area loss.
+- **The ask is small:** restoring cassava to its 2010 footprint needs **7.4% of the oil palm land
+  ADDED since 2010**. Use this framing — it converts "we need land" into a rounding error.
+- *Limit:* area coincidence, not parcel-level conversion. Rules out "no land available" (the
+  objection the recommendation must clear); proving the pathway needs SUSTAIN land-cover data.
+- **Cassava survives the substitute test by ELIMINATION** (stronger than assumption): rice is the
+  crop wheat competes with; maize is the binding feed constraint and lost 38% of its area;
+  sweet potato is 9% of cassava's volume and shrinking faster (-62% area); potato is the only
+  growing starch crop (+20%) but 8% of cassava and not flour-capable. **Sago** is a real regional
+  staple with **no FAOSTAT Indonesian series** — name it as a data gap, don't silently omit it.
+- **NEW MECHANISM — the maize channel.** Maize area **-38%**, production **-40% off its 2017 peak**
+  (25.2 -> 15.1 Mt). Less/dearer domestic corn -> feed millers substitute wheat (GAIN: 1.1 -> 2.1 MMT).
+  So there are **two independent routes** into wheat dependence, and **MOCAF only addresses the food
+  stream (9.8 MMT)** — it does nothing for the ~2.1 MMT feed stream. The deck currently has no lever
+  there at all. Maize land retention is a separate ask.
+- **Ranked action set** (`outputs/tables/grow_action_levers.csv`): **A** processing yield 20->34.6%
+  (cuts cassava needed per tonne of wheat by 42%, no land) -> **B** cassava land retention
+  (+17.8 Mt) -> **C** close yield gap (+4.06 Mt, land-neutral, bounded) -> **D** maize retention
+  (the only feed-side lever). Order the deck A, B, C, D.
+- **Key reframe:** at a realistic 10-20% blend the binding constraint is **not raw cassava
+  availability** — retention + yield gap alone would cover it several times over. It is processing
+  capacity, conversion yield, and miller/consumer acceptance. *Production is not what limits this
+  solution*, which is itself a GROW finding.
+
 ## Deliverable state (`Indonesia.pptx`, 11 slides — spine locked)
 Open items, ranked:
 1. **Slide 8 (MOCAF blending/savings matrix)** — numbers now exist. Build the slide from
@@ -109,9 +139,10 @@ Done (2026-09-01):
 Still open:
 1. **Replace the $300/t CIF wheat-price assumption** with observed import unit values from the TRADE
    track. It is the softest number in the slide-8 matrix (the volume columns don't depend on it).
-2. **Why did cassava area fall 53%?** Not answerable in QCL — needs SUSTAIN's land-cover data
-   (oil palm? urbanisation?). This is *the* determinant of whether MOCAF can scale, and currently
-   the deck's biggest unbacked link.
+2. ~~**Why did cassava area fall 53%?**~~ — **largely answered in nb 07 §2 without leaving GROW.**
+   Total cropped area grew 3.75M ha while staples lost 5.04M ha and oil palm gained 8.54M ha, so it
+   is reallocation rather than shortage. What remains for SUSTAIN is only the *parcel-level*
+   conversion pathway; the "is there land?" question is settled.
 3. **Download FAOSTAT trade (TM / detailed trade matrix).** Now the biggest data gap on this track:
    nb 06 has to carry supplier shares in as constants, so it cannot verify the deck's own two bases
    or compute Indonesia-specific import concentration (HHI) directly. Would also let the $/t import
@@ -133,6 +164,10 @@ Still open:
   2,399 ha; using it inflates the gap and the whole opportunity.
 - **Supplier shares are not ours.** They come from the deck/GAIN, not from this repo's data (no trade
   domain downloaded). Label them as external wherever they appear.
+- **Don't claim oil palm "replaced" cassava field-by-field.** nb 07 shows area coincidence at the
+  national level, which rules out a land shortage but is not parcel-level conversion evidence.
+- **Don't present the 77% "blend equivalent" from nb 07 §5 as a target.** It is headroom. Baking
+  functionality caps substitution far lower; the working band stays 10-20%.
 - The nb 06 diversification metric is **production-side only** — it ignores freight, wheat
   protein/quality class (Australian ASW vs Canadian CWRS aren't interchangeable for every miller),
   and contract availability. Don't present "rebalance to equal weights" as costless.
