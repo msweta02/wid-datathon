@@ -36,8 +36,10 @@ cassava flour), constrained on the production and processing sides. The deck arg
 - **Offset ceiling.** All 15.6 Mt -> MOCAF = 3.12-5.41 Mt flour = **32-55% of food-wheat demand**
   (9.8 MMT). Ceiling, not forecast.
 - **Achievable band.** **10% blend**: 2.83-4.90 Mt fresh cassava (**18-31%** of crop), 0.98 Mt wheat
-  avoided, **~$0.25-0.34bn/yr** ($250-350/t). **20% blend**: 5.66-9.80 Mt (**36-63%** of crop) —
-  out of reach without new land or large diversion.
+  avoided, worth **~$0.26bn/yr** at the sourced 2010-2026 mean ($265/t FOB) — range **$0.18bn** soft
+  market to **$0.35bn** tight, **$0.51bn** at the 2022 peak (E3; supersedes the old "$0.25-0.34bn
+  ($250-350/t)" assumption). **20% blend**: 5.66-9.80 Mt (**36-63%** of crop) — out of reach without
+  new land or large diversion.
 - **The land-neutral headline (best deck line).** Closing the yield gap alone funds an
   **8.3-14.3% blend from new cassava only** — no new land, no diversion. Processing yield
   (20% sun-dried vs 34.6% lab tape-yeast) decides which end of the range.
@@ -142,8 +144,9 @@ Done (2026-09-01):
 - **`FINDINGS.md` added** — consolidated record of all results, deliverables, corrections, limits.
 
 Still open:
-1. **Replace the $300/t CIF wheat-price assumption** with observed import unit values from the TRADE
-   track. It is the softest number in the slide-8 matrix (the volume columns don't depend on it).
+1. ~~**Replace the $300/t CIF wheat-price assumption**~~ — **done via E3** (World Bank Pink Sheet,
+   sourced FOB basis + labelled CIF row). Residual: a true **CIF Indonesia** series would still be
+   better than FOB-plus-assumed-freight, and would come from the TRADE track's import unit values.
 2. ~~**Why did cassava area fall 53%?**~~ — **largely answered in nb 07 §2 without leaving GROW.**
    Total cropped area grew 3.75M ha while staples lost 5.04M ha and oil palm gained 8.54M ha, so it
    is reallocation rather than shortage. What remains for SUSTAIN is only the *parcel-level*
@@ -189,19 +192,25 @@ Ranked by analytical value. None changes the thesis; all harden it against a jud
   - *Guardrail:* net vs gross conversion differ (60k/80k/100–150k ha/yr) — quote the NET series, state it.
   - *Out:* one referenced paragraph in nb 07 §2 + FINDINGS; strengthens, doesn't replace, the QCL finding.
 
-- **E3 — Wheat-price fix (World Bank Pink Sheet). LOW VALUE (it's a fix), LOWEST EFFORT — do first.**
-  - *Why:* the slide-8 `$ saved` column rests on a $300/t CIF *assumption* — your own files call it the
-    softest number in the matrix. Replace with a sourced monthly series so the dollar figures and the
-    price-sensitivity band are grounded in real history, not three round numbers.
-  - *Source:* https://www.worldbank.org/en/research/commodity-markets → `CMO-Historical-Data-Monthly.xlsx`
-    (wheat, 2010–2026). Latest: US HRW Jul-2026 = $310/mt.
-  - *Do:* pull the monthly wheat series; re-run nb 05 §6's $-saved and price-sensitivity against actual
-    range; keep the volume columns unchanged (they don't depend on price).
-  - *Guardrail:* Pink Sheet wheat is **FOB Gulf, not CIF Indonesia** — add a freight/insurance markup or
-    state the basis explicitly. Don't quietly swap an FOB number into a CIF slot.
-  - *Out:* sourced $-saved figures in the slide-8 matrix; sensitivity band over observed 2010–2026 prices.
+- ~~**E3 — Wheat-price fix (World Bank Pink Sheet)**~~ — **DONE 2026-09-01.** Verified at origin
+  (HRW Jul-2026 = $310.00/mt exactly, vintage "Updated on August 04, 2026").
+  - *Built:* `src/load.load_wheat_prices()` (graceful fallback; vintage persisted as a column since
+    `attrs` doesn't survive parquet). Workbook committed at `data/raw/CMO-Historical-Data-Monthly.xlsx`
+    so the vintage is pinned. `openpyxl` added to `requirements.txt`. New figure
+    `idn_wheat_price_history.png`. Matrix column renamed `saved_USDbn_FOB_mean` — basis is in the name.
+  - *Headline result (matters for the deck):* the old **$300/t sat at the 70th percentile** of observed
+    2010–2026 months, so the previous $-saved figures were **flattering, not conservative**. Sourced
+    HRW mean is **$265/t**; observed range **$142 (2016M12) – $522 (2022M05)**, a **3.7x** swing.
+    A 10% blend avoids 0.98 Mt of wheat = **~$0.26bn/yr at the 2010–2026 mean**, $0.18bn in a soft
+    market, $0.35bn tight, $0.51bn at the 2022 war peak. **Replaces the old "$0.25–0.34bn ($250–350/t)".**
+  - *Guardrail honoured, and widened:* the stated guardrail was FOB-vs-CIF. In fact the file carries
+    **only US SRW/HRW** — so origin/route and wheat class differ too (see CLAUDE.md). Per decision,
+    headline $ is reported **on the sourced FOB basis with the basis in the column name**, plus a
+    clearly-labelled **assumed** +$25–55/t freight row (approx CIF $290–320/t) as a magnitude check only.
+  - *Also found:* the Pink Sheet download URL rotates its vintage token and an old token serves data
+    that stops years early. Don't hardcode the URL.
 
-Order to build: **E3 (fast, safe) → E2 (fast, safe) → E1 (high-reward, higher risk).** If short on time
+Order to build: ~~E3~~ **done** → **E2 next (fast, safe)** → E1 (high-reward, higher risk). If short on time
 before the deadline, E2+E3 are cheap and defensible; E1 is the one that adds genuinely new insight but
 needs BPS data pulled and the methodology break handled.
 
@@ -231,5 +240,11 @@ needs BPS data pulled and the methodology break handled.
 - **Provincial co-location is not parcel conversion either.** Even if E1 shows staple loss and palm
   gain in the same provinces, that is province-level correlation, not field-level proof — a step up
   from national coincidence, not the end of the caveat. Keep the SUSTAIN land-cover gap named.
+- **Never quote a Pink Sheet dollar figure without its basis.** The series is **FOB US Gulf, US HRW** —
+  not CIF Indonesia, not Indonesia's suppliers (no AUS/UKR/CAN series exists in the file), not
+  Indonesia's wheat class. The matrix column is named `saved_USDbn_FOB_mean` for exactly this reason;
+  the CIF row is an **assumption** and is labelled as one. Don't let the label fall off in the deck.
+- **Check the Pink Sheet vintage before quoting.** The download URL rotates a vintage token and an old
+  token serves data that stops years early; `load_wheat_prices` carries `attrs["vintage"]` for this.
 - **ENSO forecasts conflict across authorities and are probabilistic.** If the El Niño angle uses them,
   present BMKG and NOAA/IRI as a sourced range with dates, not a settled point forecast.

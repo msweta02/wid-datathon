@@ -50,6 +50,10 @@ land = load_landuse_indonesia()   # None if sustain-eda's RL CSV isn't present; 
 # Cross-country slice — for benchmarking Indonesia against other producers (nb 05 §5).
 cas   = load_qcl_world("Cassava, fresh", ["Yield", "Production", "Area harvested"])  # nb 05 §5
 wheat = load_qcl_world("Wheat", ["Yield", "Production", "Area harvested"])           # nb 06
+
+# External enrichment (NOT FAOSTAT) — World Bank Pink Sheet monthly wheat prices, nb 05 §6.
+px = load_wheat_prices()   # None if data/raw/CMO-Historical-Data-Monthly.xlsx is absent
+px.attrs["vintage"]        # "Updated on August 04, 2026" — always check before quoting
 ```
 `load_qcl_world` reads grow-eda's already-melted global QCL cache
 (`QCL_{ymin}_{ymax}.parquet`, else `QCL_long.parquet`, else melts the raw CSV), drops
@@ -125,9 +129,19 @@ not the aggregator that reported it. Label all three as external, exactly as we 
   External corroboration of the reallocation mechanism nb 07 derives internally. **"Net" vs "gross"
   conversion figures differ (60k/80k/100–150k ha/yr)** — quote the net series and say so.
 - **World Bank Pink Sheet** (`worldbank.org/en/research/commodity-markets`) — monthly wheat price,
-  2010–2026, downloadable (`CMO-Historical-Data-Monthly.xlsx`). Replaces the $300/t CIF assumption in
-  the slide-8 matrix. **Pink Sheet wheat is FOB Gulf, not CIF** (HRW Jul-2026 = $310/mt); add a
-  freight/insurance markup before substituting, or state the basis explicitly.
+  2010–2026, downloadable (`CMO-Historical-Data-Monthly.xlsx`). **DONE (E3)** — wired in via
+  `load_wheat_prices`; replaced the $300/t assumption in the slide-8 matrix. Verified at origin:
+  HRW Jul-2026 = **$310.00/mt** exactly. Three things learned the hard way:
+  - **The download URL carries a rotating vintage token** (`…-0050012025` vs `…-0050012026`) and an
+    old token silently serves stale data — the 2025 token stops at Dec-2025. Scrape the current link
+    off the portal page; never hardcode it. The workbook is committed so the exact vintage is pinned.
+  - **Only US SRW / US HRW are in the file.** No Australian, Ukrainian or Canadian series (Canada CWRS
+    is described but has no data column). So the mismatch vs Indonesia is threefold, not just FOB/CIF:
+    **basis** (FOB vs CIF), **origin/route** (US Gulf vs a much shorter Australia haul), and **wheat
+    class** (HRW hard/high-protein vs Australian ASW mid-protein). It is a benchmark, never
+    "Indonesia's import price".
+  - `DataFrame.attrs` does **not** survive `to_parquet` — the vintage rides along as a column instead,
+    because a silently-stale price series is exactly the failure this task existed to prevent.
 
 ## Workflow
 `notebooks/` run in order 01→07:

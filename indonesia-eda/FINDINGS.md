@@ -91,8 +91,11 @@ Tested rather than assumed. Cassava wins **by elimination** — a stronger claim
 - **Offset ceiling:** all 15.6 Mt → MOCAF = 3.12–5.41 Mt flour = **32–55% of food-wheat demand**
   (9.8 MMT). A ceiling, not a forecast — cassava already feeds food/feed/starch demand.
 - **Achievable band (slide 8):** a **10% blend** needs 2.83–4.90 Mt fresh cassava (18–31% of the
-  crop), avoids 0.98 Mt wheat, saves **~$0.25–0.34bn/yr** ($250–350/t). A **20% blend** needs
+  crop) and avoids **0.98 Mt** of wheat imports — worth **~$0.26bn/yr** at the sourced 2010–2026 mean
+  wheat price, **$0.18bn** in a soft market, **$0.35bn** in a tight one, **$0.51bn** at the 2022 peak
+  (World Bank Pink Sheet, **US HRW FOB US Gulf** — see §2.5a for the basis). A **20% blend** needs
   5.66–9.80 Mt (36–63% of the crop) — out of reach without new land or large diversion.
+
 - **The land-neutral headline:** closing the yield gap alone funds an **8.3–14.3% blend from new
   cassava only**. Which end of the range depends on **processing yield**, not on farmers.
 
@@ -101,6 +104,27 @@ Tested rather than assumed. Cassava wins **by elimination** — a stronger claim
 > The *unfiltered* global leader is **Guyana on 2,399 ha** — a garden plot, which would inflate the
 > gap to 32%. Notebook 05 now filters to producers ≥50,000 ha. **Net effect: the yield story got
 > smaller and the land-retention story got bigger.**
+
+### 2.5a Wheat price — sourced, on a stated basis (task E3)
+The `$ saved` column no longer rests on an assumption.
+- **Source:** World Bank Pink Sheet, `CMO-Historical-Data-Monthly.xlsx`
+  ([portal](https://www.worldbank.org/en/research/commodity-markets)), vintage *Updated on
+  August 04, 2026*, 199 months 2010M01–2026M07, via `src.load.load_wheat_prices`.
+- **Observed US HRW (FOB US Gulf):** mean **$265/t**, median $265, p10 $180, p90 $359,
+  min **$142** (2016M12), max **$522** (2022M05, Ukraine invasion) — a **3.7× range**.
+  Latest **$310** (2026M07), which matches the figure cited in `CONTEXT.md` exactly.
+- **The old assumption was flattering, not conservative.** `$300/t` sat at the **70th percentile** of
+  observed months — higher than 70% of the actual history. Sourced mean is $265/t, so the previous
+  $-saved figures were overstated by ~13%.
+- **Basis warning — three gaps, not one.** The file contains only **US SRW / US HRW**; there is no
+  Australian, Ukrainian or Canadian series. So it differs from Indonesia's landed cost by **basis**
+  (FOB vs CIF), **origin/route** (US Gulf vs a much shorter Australia haul) and **wheat class**
+  (HRW hard/high-protein vs Australian ASW mid-protein). Reported headline is on the **FOB basis**,
+  with the basis in the column name (`saved_USDbn_FOB_mean`). A separate, explicitly **assumed**
+  +$25–55/t freight+insurance row (≈ CIF $290–320/t) is a magnitude check only — not a better number.
+- **Operational trap:** the download URL carries a rotating vintage token; an old token silently
+  serves data that stops years early (the 2025 token ends at Dec-2025). The workbook is committed so
+  the vintage is pinned, and the vintage string travels with the frame.
 
 ### 2.6 The maize channel — a second route into wheat dependence (nb 07 §4) ★
 New. The deck treats feed-wheat growth as a demand quirk; it is a production story.
@@ -202,6 +226,7 @@ cannot reduce the 12.3 Mt Indonesia must buy; cassava → MOCAF reduces the volu
 - `idn_maize_channel` ★ — the second route into wheat dependence
 - `idn_cassava_yield_vs_peers` — Indonesia already #2 of 40
 - `idn_mocaf_blend_requirement` — slide 8 asset
+- `idn_wheat_price_history` — observed wheat prices vs the retired $300/t assumption
 - `idn_supply_supplier_production`, `idn_supply_australia_area_vs_yield`,
   `idn_supply_diversification` — supplier fragility
 
@@ -210,6 +235,8 @@ cannot reduce the 12.3 Mt Indonesia must buy; cassava → MOCAF reduces the volu
   (`Area Code >= 5000`) and FAOSTAT's China composite; caches per-item
 - `clean.drop_china_composite` — code 351 double-counts `China, mainland`
 - `clean.tonnes_only` — `Production` mixes `t` with `1000 No` (eggs); see §5
+- `load.load_wheat_prices()` — World Bank Pink Sheet monthly wheat (external, not FAOSTAT);
+  graceful fallback if the workbook is absent; vintage persisted as a column
 
 ---
 
@@ -242,14 +269,19 @@ cannot reduce the 12.3 Mt Indonesia must buy; cassava → MOCAF reduces the volu
 - **Import volumes and supplier shares are external constants** (deck slides 3–4, USDA GAIN) —
   this repo has no FAOSTAT trade domain. Never present a supplier share as if derived here.
   Adding a TM loader is the single highest-value data addition left.
-- **$300/t CIF wheat price** in the slide-8 matrix is an assumption; TRADE should replace it with
-  observed unit values. (Volume columns don't depend on it.)
+- ~~**$300/t CIF wheat price**~~ — replaced in E3 by the sourced Pink Sheet series (§2.5a). Residual
+  gap: a true **CIF Indonesia** series would beat FOB-plus-assumed-freight, and would come from the
+  TRADE track's observed import unit values. The FOB basis must stay labelled until then.
 - **Parcel-level land conversion** — SUSTAIN land-cover data.
 - The nb 06 diversification metric is **production-side only**: it ignores freight, wheat
   protein/quality class (Australian ASW and Canadian CWRS are not interchangeable for every
   miller), and contract availability. "Rebalance to equal weights" is not costless.
 
 **Presentation guardrails**
+- **Never quote a Pink Sheet dollar figure without its basis** (FOB US Gulf, US HRW — not CIF, not
+  Indonesia's suppliers, not Indonesia's wheat class). The CIF row is an assumption; keep it labelled.
+- **Check the Pink Sheet vintage** before quoting — the download URL rotates and stale tokens serve
+  truncated data.
 - MOCAF flour-equivalent figures are **ceilings**, never point forecasts.
 - The **77% "blend equivalent"** in nb 07 §5 is **headroom, not a target** — baking functionality
   caps substitution far lower; the working band stays 10–20%.
