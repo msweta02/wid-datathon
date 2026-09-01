@@ -1,9 +1,17 @@
 # Indonesia Deep-Dive — GROW Track
 
 ## Project goal
-Sibling to `grow-eda`, scoped to one country: **what does Indonesia grow, and
-when/how intensively?** Purpose: turn the global GROW overview into a sharp,
-defensible single-country hypothesis (or rule Indonesia out as the focus).
+Sibling to `grow-eda`, scoped to one country. The single-country scan has already
+served its purpose: **Indonesia is locked as the focus**, and the project now has a
+thesis — *Indonesia is the world's #1 wheat importer and grows zero wheat; the
+domestic lever against that import vulnerability is cassava → MOCAF (fermented
+cassava flour).* The GROW track's job is to make the production data (QCL/QI/QV)
+**support and bound that thesis**: establish the structural wheat-zero, size the
+cassava base, and quantify how much wheat cassava could realistically offset.
+
+Sister tracks (EAT / TRADE / SUSTAIN) carry the demand, trade-flow, and
+sustainability sides; this repo is the production-side lens, built to sit against
+a TRADE import view.
 
 ## Data source — reused, not re-downloaded
 This track has no bulk downloads of its own. `src/load.py` reads directly from:
@@ -69,6 +77,18 @@ used in `sustain-eda/src/load.py` for optional datasets) and extend
   gotchas as grow-eda apply here — `src/clean.py` carries over the relevant helpers.
 
 ## Workflow
-`notebooks/` run in order 01→04: 01 load + inventory, 02 what it grows (crop mix,
-volume/area/value rankings, rice area-vs-yield), 03 when it grows (cropping
-intensity proxy + the data-gap note above), 04 synthesis (findings + go/no-go).
+`notebooks/` run in order 01→05:
+- 01 load + inventory
+- 02 what it grows (crop mix; rice area-vs-yield: prod −10.4% on −14.8% area, +5.3% yield)
+- 03 when it grows (cropping-intensity proxy 114%→99%; 2015→2024 area decomposition —
+  rice, maize, soy, cassava all lost area; + the month-data gap note below)
+- 04 synthesis (findings; being rewritten from a generic go/no-go into the scoped
+  cassava recommendation fed by 05)
+- 05 cassava substitution (the thesis bridge): structural wheat-zero vs domestic
+  staples; cassava production/area/yield trajectory; area-vs-yield decomposition;
+  cassava yield gap vs global frontier; MOCAF flour-equivalent vs wheat demand;
+  realistic 10–20% blend requirement. §7 feeds 04 and deck slide 8.
+
+Note: cassava **area is declining** — the proposed solution's own raw material is
+under pressure. Keep that tension visible; it's what points policy at yield +
+land-retention rather than "just grow more."
