@@ -104,3 +104,17 @@ def drop_china_composite(df: pd.DataFrame) -> pd.DataFrame:
     if "Area Code" in df.columns:
         return df[df["Area Code"] != CHINA_COMPOSITE_AREA_CODE].copy()
     return df[df["Area"] != "China"].copy()
+
+
+# FAOSTAT reports QCL "Production" in more than one unit: crops in tonnes, but
+# eggs (and some livestock items) in "1000 No". Grouping by Item alone therefore
+# sums heads/numbers into tonnages — which ranked hen eggs as Indonesia's #2
+# "crop" (146bn eggs + 6.6Mt read as 1.5e8 t). Always filter before ranking.
+TONNE_UNITS = ("t", "tonnes")
+
+
+def tonnes_only(df: pd.DataFrame, unit_col: str = "Unit") -> pd.DataFrame:
+    """Keep only rows reported in tonnes, so a tonnage ranking stays comparable."""
+    if unit_col not in df.columns:
+        return df
+    return df[df[unit_col].astype(str).str.strip().str.lower().isin(TONNE_UNITS)].copy()

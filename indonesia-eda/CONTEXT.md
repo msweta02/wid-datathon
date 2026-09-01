@@ -135,6 +135,11 @@ Done (2026-09-01):
 - ~~Slide-8 savings model~~ — nb 05 §6: full matrix + $ saved + price sensitivity ($250/300/350/t),
   exported to `outputs/tables/slide8_mocaf_blend_matrix.csv`, plus the blend-requirement figure.
 - Also fixed: two `''`-in-f-string bugs in nb 05 that were printing literal `{cur_area:,.0f}`.
+- Also fixed (nb 02 + nb 04): **unit mixing in the tonnage ranking**. `Production` reports crops in
+  `t` but eggs in `1000 No`, and `Hen eggs in shell, fresh` appears under both -> grouping by `Item`
+  ranked **hen eggs as Indonesia's #2 crop by production** (146bn eggs summed with 6.6 Mt). New
+  helper `clean.tonnes_only`. Corrected top-5: oil palm, rice, sugar cane, coconuts, cassava.
+- **`FINDINGS.md` added** — consolidated record of all results, deliverables, corrections, limits.
 
 Still open:
 1. **Replace the $300/t CIF wheat-price assumption** with observed import unit values from the TRADE
@@ -150,6 +155,55 @@ Still open:
 4. **Optional GROW extensions** — cassava production concentration (supply security of the substitute
    itself); QV value angle (cassava worth more as flour than tapioca? QV has cassava at $4.76bn);
    tie land-conversion (SUSTAIN) to the cassava area decline in nb 03/05.
+
+## Enrichment tasks (source-anchored — research done, do NOT re-research; fetch the named endpoint)
+These came out of the official-sources research (2026-09-01). Each names a primary source, the figure
+to pull, a guardrail, and the expected output. Verify every number at the primary portal before it
+lands in a notebook or the deck (some were surfaced via aggregators — see CLAUDE.md provenance rule).
+Ranked by analytical value. None changes the thesis; all harden it against a judge's probing.
+
+- **E1 — Provincial reallocation overlay (BPS). HIGHEST VALUE, HIGHEST EFFORT.**
+  - *Why:* closes nb 07's standing caveat — currently reallocation is national-total coincidence; this
+    tests spatial co-location. If staple-area decline concentrates in the SAME provinces as oil-palm
+    expansion (Sumatra/Kalimantan), the mechanism goes from "both happened nationally" to "happened in
+    the same places." Also surfaces an honest complication: cassava land (Lampung/Java) and palm land
+    (Sumatra/Kalimantan) may not be the same land — say so if the data shows it.
+  - *Source:* BPS province tables — rice https://www.bps.go.id/en/statistics-table?subject=557 ;
+    cassava/maize via provincial BPS sites (top cassava provinces: Lampung, Central Java, East Java).
+  - *Do:* new `src/load.py` loader for BPS provincial CSVs (follow the try_read graceful-fallback
+    pattern); a notebook section mapping/tabulating staple-area Δ vs palm-area Δ by province.
+  - *Guardrail:* BPS rice methodology breaks at KSA (2018) and moves monthly (Mar 2025) — verify vintage
+    across 2010–2024, don't splice methods silently. BPS≠FAOSTAT totals (different method); label which.
+  - *Out:* province-level Δarea table + figure; one sentence on whether the reallocation is spatially matched.
+
+- **E2 — Land-conversion corroboration (Kementan / ATR-BPN). MEDIUM VALUE, LOW EFFORT.**
+  - *Why:* nb 07 infers reallocation from QCL area math alone. Indonesia's own land agency reporting
+    ~60–80k ha/yr net paddy loss is independent, government-sourced confirmation — makes the finding
+    un-dismissable and gives a real driver (Java sawah loss to housing/infrastructure) for the effect
+    QCL can only show.
+  - *Source:* Statistik Lahan Pertanian PDF,
+    https://satudata.pertanian.go.id/assets/docs/publikasi/Statistik_Lahan_Pertanian_Tahun_2015-2019.pdf
+    (+ newer editions if present); ATR/BPN net-loss figure ~60–80k ha/yr, cumulative ~79,600 ha 2019–2024.
+  - *Do:* add as a sourced constant + citation in nb 07 §2 alongside the internal palm-expansion math;
+    NOT a new dataset to model — a corroborating external reference.
+  - *Guardrail:* net vs gross conversion differ (60k/80k/100–150k ha/yr) — quote the NET series, state it.
+  - *Out:* one referenced paragraph in nb 07 §2 + FINDINGS; strengthens, doesn't replace, the QCL finding.
+
+- **E3 — Wheat-price fix (World Bank Pink Sheet). LOW VALUE (it's a fix), LOWEST EFFORT — do first.**
+  - *Why:* the slide-8 `$ saved` column rests on a $300/t CIF *assumption* — your own files call it the
+    softest number in the matrix. Replace with a sourced monthly series so the dollar figures and the
+    price-sensitivity band are grounded in real history, not three round numbers.
+  - *Source:* https://www.worldbank.org/en/research/commodity-markets → `CMO-Historical-Data-Monthly.xlsx`
+    (wheat, 2010–2026). Latest: US HRW Jul-2026 = $310/mt.
+  - *Do:* pull the monthly wheat series; re-run nb 05 §6's $-saved and price-sensitivity against actual
+    range; keep the volume columns unchanged (they don't depend on price).
+  - *Guardrail:* Pink Sheet wheat is **FOB Gulf, not CIF Indonesia** — add a freight/insurance markup or
+    state the basis explicitly. Don't quietly swap an FOB number into a CIF slot.
+  - *Out:* sourced $-saved figures in the slide-8 matrix; sensitivity band over observed 2010–2026 prices.
+
+Order to build: **E3 (fast, safe) → E2 (fast, safe) → E1 (high-reward, higher risk).** If short on time
+before the deadline, E2+E3 are cheap and defensible; E1 is the one that adds genuinely new insight but
+needs BPS data pulled and the methodology break handled.
 
 ## Intellectual-honesty guardrails (keep in the story, don't smooth over)
 - Cassava **area is declining** — the solution's raw material is itself under pressure.
@@ -171,3 +225,11 @@ Still open:
 - The nb 06 diversification metric is **production-side only** — it ignores freight, wheat
   protein/quality class (Australian ASW vs Canadian CWRS aren't interchangeable for every miller),
   and contract availability. Don't present "rebalance to equal weights" as costless.
+- **Enrichment sources are external and must be cited at origin.** BPS / Kementan / World Bank data
+  (tasks E1–E3) is not FAOSTAT and not this repo's — label it, and cite the primary `.go.id` / World
+  Bank portal, never the aggregator that surfaced the figure. Same discipline as supplier shares.
+- **Provincial co-location is not parcel conversion either.** Even if E1 shows staple loss and palm
+  gain in the same provinces, that is province-level correlation, not field-level proof — a step up
+  from national coincidence, not the end of the caveat. Keep the SUSTAIN land-cover gap named.
+- **ENSO forecasts conflict across authorities and are probabilistic.** If the El Niño angle uses them,
+  present BMKG and NOAA/IRI as a sourced range with dates, not a settled point forecast.

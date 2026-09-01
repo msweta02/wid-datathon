@@ -13,6 +13,11 @@ Sister tracks (EAT / TRADE / SUSTAIN) carry the demand, trade-flow, and
 sustainability sides; this repo is the production-side lens, built to sit against
 a TRADE import view.
 
+**`FINDINGS.md` is the consolidated analysis record** — every finding, number, deliverable,
+correction and known limit across notebooks 01-07 in one place. Read it before re-deriving
+anything. This file owns *infrastructure*; `CONTEXT.md` owns the *build queue*; `FINDINGS.md`
+owns the *results*.
+
 ## Data source — reused, not re-downloaded
 This track has no bulk downloads of its own. `src/load.py` reads directly from:
 - `../grow-eda/data/raw/Production_Crops_Livestock_E_All_Data.csv` (QCL)
@@ -95,11 +100,34 @@ used in `sustain-eda/src/load.py` for optional datasets) and extend
   parcel-level proof needs land-cover data (SUSTAIN).
 - Same **flag** and **item-aggregate** (`"Cereals, primary"`, `"Fruit Primary"`, etc.)
   gotchas as grow-eda apply here — `src/clean.py` carries over the relevant helpers.
+- **`Production` mixes units.** Crops are in `t`, but eggs (and some livestock items) are in
+  `1000 No` — and `Hen eggs in shell, fresh` appears under BOTH. Grouping by `Item` alone summed
+  146bn eggs into the tonnage and ranked eggs as Indonesia's #2 "crop". Always
+  `clean.tonnes_only(df)` before any tonnage ranking.
 - **No trade data in this repo.** QCL/QI/QV/RL are production-side only; FAOSTAT's trade
   domain (TM / detailed trade matrix) is not downloaded. So import volumes and supplier
   shares are **carried in as sourced constants** (deck slides 3–4, USDA GAIN) — see nb 06 §1.
   Never present a supplier share as if this repo derived it. Adding a TM loader is the single
   highest-value data addition left for this track.
+
+## External sources (enrichment — NOT FAOSTAT, verify at origin before citing)
+FAOSTAT is national + annual. Three official sources close gaps it structurally cannot, and are
+staged as enrichment tasks in `CONTEXT.md`. **Provenance rule:** the sourcing research surfaced a
+few of these figures via secondary aggregators (`.id` news sites, one blog). Before ANY number
+from these goes in a notebook or the deck, pull it from the primary portal below and cite THAT —
+not the aggregator that reported it. Label all three as external, exactly as we label supplier shares.
+- **BPS provincial crop data** (`bps.go.id`) — cassava/rice/maize harvested area + production BY
+  PROVINCE. Not in the FAOSTAT cache; must be pulled separately. Note the **KSA methodology break
+  (rice, 2018)** and that BPS moved rice to monthly tables (Mar 2025) — check vintage across 2010–2024.
+  Enables the provincial reallocation overlay (the caveat-closer for nb 07's national-coincidence limit).
+- **Kementan/ATR-BPN land conversion** (`satudata.pertanian.go.id`, Statistik Lahan Pertanian PDF) —
+  official net paddy loss ~60,000–80,000 ha/yr, cumulative ~79,600 ha (2019–2024), Java-concentrated.
+  External corroboration of the reallocation mechanism nb 07 derives internally. **"Net" vs "gross"
+  conversion figures differ (60k/80k/100–150k ha/yr)** — quote the net series and say so.
+- **World Bank Pink Sheet** (`worldbank.org/en/research/commodity-markets`) — monthly wheat price,
+  2010–2026, downloadable (`CMO-Historical-Data-Monthly.xlsx`). Replaces the $300/t CIF assumption in
+  the slide-8 matrix. **Pink Sheet wheat is FOB Gulf, not CIF** (HRW Jul-2026 = $310/mt); add a
+  freight/insurance markup before substituting, or state the basis explicitly.
 
 ## Workflow
 `notebooks/` run in order 01→07:
