@@ -7,3 +7,4 @@ plotly>=5.18
 pyarrow>=14.0
 jupyter>=1.0
 ipykernel>=6.0
+openpyxl>=3.1   # reads the World Bank Pink Sheet .xlsx (src/load.load_wheat_prices)

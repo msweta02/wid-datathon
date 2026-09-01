@@ -228,3 +228,97 @@ def load_qcl_world(item: str | None = None, elements: list[str] | None = None,
               f"{world['Area'].nunique()} countries -> {cache.name}")
 
     return world[world["Element"].isin(elements)].copy() if elements else world
+
+
+# --- External enrichment: wheat prices (World Bank Pink Sheet) -------------
+# NOT FAOSTAT. The slide-8 "$ saved" column previously rested on a bare $300/t
+# assumption; this replaces it with an observed monthly series (task E3).
+#
+# Source portal (cite THIS, never an aggregator):
+#   https://www.worldbank.org/en/research/commodity-markets
+#   -> "Monthly prices" / CMO-Historical-Data-Monthly.xlsx
+#
+# The download URL carries a rotating vintage token (…-0050012025 vs …-0050012026)
+# and an old token silently serves stale data — the 2025 vintage stops at Dec-2025.
+# So we do NOT hardcode a URL: drop the .xlsx into data/raw/ and the vintage string
+# from the sheet travels with the frame as `df.attrs["vintage"]`.
+#
+# BASIS WARNING, carried in code so it can't be lost downstream: these are
+# **FOB export prices at the US Gulf**, not CIF Indonesia, and the file contains
+# only US SRW / US HRW — no Australian, Ukrainian or Canadian series (Canada CWRS
+# appears in the Description sheet with no data column). Indonesia buys
+# Australian/Ukrainian/Canadian wheat of a different class over a different route.
+# Treat as a global benchmark; never label it "Indonesia's import price".
+PINK_SHEET_FILE = "CMO-Historical-Data-Monthly.xlsx"
+PINK_SHEET_PORTAL = "https://www.worldbank.org/en/research/commodity-markets"
+PINK_SHEET_SHEET = "Monthly Prices"
+PINK_SHEET_HEADER_ROW = 4      # row holding commodity names
+PINK_SHEET_FIRST_DATA_ROW = 6  # first row holding a YYYYMmm label
+WHEAT_SERIES = {"Wheat, US HRW": "HRW", "Wheat, US SRW": "SRW"}
+WHEAT_PRICE_BASIS = "FOB export price, US Gulf (World Bank Pink Sheet) — NOT CIF Indonesia"
+
+
+def load_wheat_prices(year_min: int = YEAR_MIN, year_max: int = 2026,
+                      refresh: bool = False) -> pd.DataFrame | None:
+    """
+    Monthly wheat prices (USD/tonne) from the World Bank Pink Sheet, filtered to
+    [year_min, year_max]. Returns None (with a clear message) if the workbook
+    isn't present — same graceful-fallback contract as `load_landuse_indonesia`.
+
+    Columns: ym ('2026M07'), year, month, HRW, SRW.
+    `df.attrs["vintage"]` carries the sheet's own "Updated on ..." string, and
+    `df.attrs["basis"]` carries WHEAT_PRICE_BASIS — check both before quoting.
+
+    >>> px = load_wheat_prices()
+    >>> px.attrs["vintage"], px["HRW"].mean()
+    """
+    cache = PROCESSED / f"wheat_prices_{year_min}_{year_max}.parquet"
+    if cache.exists() and not refresh:
+        print(f"[cache] {cache.name}")
+        out = pd.read_parquet(cache)
+        out.attrs["vintage"] = out.attrs.get("vintage", "unknown (cached)")
+        out.attrs["basis"] = WHEAT_PRICE_BASIS
+        return out
+
+    path = RAW / PINK_SHEET_FILE
+    if not path.exists():
+        print(f"[optional] {path} not found — the slide-8 $-saved column will fall back to "
+              f"its unsourced assumption.\n"
+              f"           Download 'Monthly prices' ({PINK_SHEET_FILE}) from {PINK_SHEET_PORTAL} "
+              f"and drop it in data/raw/.\n"
+              f"           Take the CURRENT vintage — an older URL token serves data that stops "
+              f"years early.")
+        return None
+
+    raw = pd.read_excel(path, sheet_name=PINK_SHEET_SHEET, header=None)
+    vintage = str(raw.iloc[3, 0]).strip()
+
+    # Locate series by NAME, not column index — column order shifts between vintages.
+    names = [str(x) for x in raw.iloc[PINK_SHEET_HEADER_ROW]]
+    cols = {short: names.index(full) for full, short in WHEAT_SERIES.items() if full in names}
+    missing = set(WHEAT_SERIES.values()) - set(cols)
+    if missing:
+        raise ValueError(
+            f"Wheat series {sorted(missing)} not found in {PINK_SHEET_FILE} "
+            f"(header row {PINK_SHEET_HEADER_ROW}). The Pink Sheet layout changed — "
+            f"re-check the column names rather than assuming positions."
+        )
+
+    body = raw.iloc[PINK_SHEET_FIRST_DATA_ROW:]
+    out = pd.DataFrame({"ym": body.iloc[:, 0].astype(str)})
+    for short, idx in cols.items():
+        out[short] = pd.to_numeric(body.iloc[:, idx], errors="coerce")
+
+    out = out[out["ym"].str.match(r"^\d{4}M\d{2}$", na=False)].dropna(how="all", subset=list(cols))
+    out["year"] = out["ym"].str.slice(0, 4).astype(int)
+    out["month"] = out["ym"].str.slice(5, 7).astype(int)
+    out = (out[(out["year"] >= year_min) & (out["year"] <= year_max)]
+           .reset_index(drop=True)[["ym", "year", "month", *cols]])
+
+    out.to_parquet(cache, index=False)
+    print(f"[pink sheet] {vintage} | {len(out)} months {out['ym'].iloc[0]}–{out['ym'].iloc[-1]} "
+          f"-> {cache.name}")
+    print(f"[pink sheet] BASIS: {WHEAT_PRICE_BASIS}")
+    out.attrs["vintage"] = vintage
+    out.attrs["basis"] = WHEAT_PRICE_BASIS
+    return out
