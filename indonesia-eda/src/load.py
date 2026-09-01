@@ -274,10 +274,13 @@ def load_wheat_prices(year_min: int = YEAR_MIN, year_max: int = 2026,
     """
     cache = PROCESSED / f"wheat_prices_{year_min}_{year_max}.parquet"
     if cache.exists() and not refresh:
-        print(f"[cache] {cache.name}")
         out = pd.read_parquet(cache)
-        out.attrs["vintage"] = out.attrs.get("vintage", "unknown (cached)")
+        # DataFrame.attrs does NOT survive to_parquet, so the vintage rides along as a
+        # column — the staleness signal is the whole point of tracking it.
+        out.attrs["vintage"] = (out["vintage"].iloc[0] if "vintage" in out.columns and len(out)
+                                else "unknown")
         out.attrs["basis"] = WHEAT_PRICE_BASIS
+        print(f"[cache] {cache.name} | {out.attrs['vintage']}")
         return out
 
     path = RAW / PINK_SHEET_FILE
@@ -314,6 +317,7 @@ def load_wheat_prices(year_min: int = YEAR_MIN, year_max: int = 2026,
     out["month"] = out["ym"].str.slice(5, 7).astype(int)
     out = (out[(out["year"] >= year_min) & (out["year"] <= year_max)]
            .reset_index(drop=True)[["ym", "year", "month", *cols]])
+    out["vintage"] = vintage        # survives the parquet round-trip; attrs would not
 
     out.to_parquet(cache, index=False)
     print(f"[pink sheet] {vintage} | {len(out)} months {out['ym'].iloc[0]}–{out['ym'].iloc[-1]} "
