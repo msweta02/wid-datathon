@@ -74,6 +74,12 @@ Same as `grow-eda`: reusable code in `src/`, notebooks stay thin, figures →
 `outputs/figures/`, cached frames → `data/processed/*.parquet` (never re-melt
 the full global CSV if the country-filtered cache already exists).
 
+**Figure convention:** every trend or comparison **table** in a notebook has a companion plot
+immediately after it, and the table stays. If you add a table, add its plot. Two pairs are
+deliberately near-duplicates and must not be merged: `idn_area_change_2015_2024_temporary` (nb 03,
+**temporary crops only** — oil palm excluded by FAO's arable-land definition) vs
+`idn_area_change_by_crop` (nb 07, **all crops** — oil palm dominates). The contrast is the finding.
+
 ## Pre-flight check — run this before anything goes on a slide
 ```bash
 python tools/check_stale_numbers.py        # exit 1 if a retired number survives anywhere

@@ -39,6 +39,15 @@ and its subtitle has a stray leading "A")*
   wheat price, **0.18bn** in a soft market, **0.35bn** in a tight one.
 - A 20% blend avoids 1.96 Mt: **~USD 0.52bn** (range 0.35–0.70bn).
 
+**Credibility line (use early, it pre-empts the obvious challenge)**
+> Indonesia is the world's **#6 cassava producer by volume** — and **#2 by yield among the 40 countries
+> that grow it at scale**.
+
+This concedes up front that the yield lever is nearly exhausted, which is what makes land retention and
+processing yield the credible asks instead of "grow cassava better". Say *"40 countries that grow it at
+scale"*, not *"peers"*: the ≥50,000 ha filter is load-bearing — unfiltered, the global yield leader is
+Guyana on 2,399 ha, which would inflate Indonesia's apparent gap from 20.6% to 32%.
+
 ## The line to land
 > Indonesia does not need more cassava land to start. It needs **better processing** — and it needs to
 > **stop losing the cassava land it already has**.
@@ -68,7 +77,8 @@ and its subtitle has a stray leading "A")*
 - If asked *"why not just grow more cassava?"* — cassava **area fell 53%** since 2010 (nb 05 §3). The
   crop is shrinking; the yield gap is the only land-neutral headroom, and it is finite at +4.06 Mt.
 - If asked *"why is Indonesia's yield gap small?"* — because it has already intensified: yield **+39.6%**
-  since 2010, now #2 of 40 peer producers. Credit, not criticism.
+  since 2010, now #2 by yield of the 40 countries that grow cassava at scale (>=50,000 ha).
+  Credit, not criticism.
 - If asked *"is this the whole import bill?"* — no, and say so plainly. This addresses the **food**
   stream only. The feed stream (~2.1 MMT, growing because domestic maize area fell 38%) needs a
   separate lever: maize land retention (nb 07 §4).

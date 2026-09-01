@@ -6,7 +6,7 @@ TRADE / EAT / SUSTAIN are out of scope; where their data is needed it is named a
 `../grow-eda` and `../sustain-eda`. See `CLAUDE.md` for loaders, `CONTEXT.md` for the
 build queue and deck state.
 
-**Status (2026-09-01):** notebooks 01–07 all execute end-to-end, **0 errors**. 20 figures,
+**Status (2026-09-01):** notebooks 01–07 all execute end-to-end, **0 errors**. 24 figures,
 3 tables, 1 copy deck. `python tools/check_stale_numbers.py` → **exit 0**.
 **Enrichment is closed:** E3 done (§2.5a), E2 closed partially (§2.3a), E1 blocked (§6).
 **Slide 8 is built** (§4a). No further source-chasing planned.
@@ -246,7 +246,18 @@ cannot reduce the 12.3 Mt Indonesia must buy; cassava → MOCAF reduces the volu
 - `supplier_diversification_scenarios.csv` — sourcing mix → pool volatility, worst year
 - `grow_action_levers.csv` — lever → actor → sized effect
 
-**Key figures** (`outputs/figures/`, 20 total)
+**Key figures** (`outputs/figures/`, 24 total)
+
+*Trend/comparison tables now each have a companion plot — tables kept as-is:*
+- `idn_decomposition_area_vs_yield` (nb 04) — the central pattern: production down, **area down hard,
+  yield up**, for all four staples on one axis
+- `idn_area_change_2015_2024_temporary` (nb 03) — which temporary crops gave up the area behind the
+  cropping-intensity fall (permanent crops excluded by definition, so no oil palm)
+- `idn_area_change_by_crop` (nb 07) — the all-crop version, where oil palm's +8.54M ha dwarfs
+  everything; the contrast with the nb 03 chart is the point
+- `idn_supplier_reliability` (nb 06) — volatility vs worst single year, so suppliers and
+  non-exporters separate visibly into opposite corners
+
 - `idn_staples_vs_wheat_zero` — the structural zero
 - `idn_land_reallocation` ★ — total area grew while staples shrank; oil palm crossover
 - `idn_substitute_candidates` ★ — cassava by elimination
@@ -304,6 +315,24 @@ Asset `outputs/figures/idn_slide8_blend_and_savings.png` (2872×1342, 200 dpi): 
   "MOCA**G**", subtitle has a stray leading "A".
 - ⚠ The draft's **8.25M t** baseline matches no sourced figure. If it appears elsewhere in the deck it
   needs the same treatment.
+
+**Pre-build verification — all three checks PASS** (full record: `outputs/slide8_verification.md`):
+1. **Matrix is final and FOB-clean.** Exactly one monetary column, `saved_USDbn_FOB_mean` (basis in the
+   name); implied price **$265.335/t on all 8 rows**, matching the loader exactly; **no standalone `300`
+   token** (a naive substring grep hits float noise in `0.13001423…`, not a price); no CIF column and no
+   untagged monetary column.
+2. **The 8.3–14.3% headline reconciles**, but is **not a column** — it needs two steps:
+   `fresh_cassava_Mt × %_fundable ÷ 100 = 4.064426 Mt` (identical from all 8 rows), then
+   `× 0.20 / 0.346 ÷ 9.8 MMT` → 8.295% / 14.350%. **Two inputs live outside the CSV**: food-wheat
+   9.8 MMT (GAIN) and the conversion rates (only inside the `mocaf_conversion` label text).
+3. **Both cassava ranks correct, no conflict** — different metrics. **#6 of 97 by volume** (15.62 Mt,
+   4.6% of the 342 Mt world crop) and **#2 of 40 by yield** among producers ≥50,000 ha (28.2 t/ha, behind
+   India's 35.6). Agreed slide phrasing: *"the world's #6 cassava producer by volume — and #2 by yield
+   among the 40 countries that grow it at scale."* Say "40 countries that grow it at scale", not "peers":
+   the ≥50k ha filter is load-bearing, since unfiltered the leader is Guyana on 2,399 ha, which inflates
+   the gap from 20.6% to 32%.
+- **Known nit, not fixed (analysis frozen):** the CSV carries float noise (`0.13001423618090452` for
+  `0.13`). Use the rounded table in `slide8_verification.md` for the slide.
 
 ---
 

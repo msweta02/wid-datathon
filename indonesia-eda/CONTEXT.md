@@ -124,6 +124,9 @@ Open items, ranked:
    - **Added the two strongest things the draft omitted:** the **conversion-yield axis** (20% sun-dried vs
      34.6% lab nearly halves the cassava needed — lever A) and the **yield-gap headroom line**
      (+4.06 Mt), which is what makes the 10%-vs-20% verdict visible.
+   **Pre-build verification signed off** — `outputs/slide8_verification.md` (matrix FOB-clean, headline
+   traceable, both cassava ranks confirmed #6-by-volume / #2-of-40-by-yield). Deck copy in
+   `outputs/slide8_copy.md`.
    Residual: draft title reads "MOCA**G**" and the subtitle has a stray leading "A" — fix in the deck.
    Deck edit itself (.pptx) NOT done — `python-pptx` isn't installed and `OtherDetails/` is gitignored,
    so the deck is unversioned; back it up before any programmatic edit.
