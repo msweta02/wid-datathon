@@ -35,13 +35,27 @@ standalone.
 
 ## Loader — quick reference
 ```python
-from src.load import load_indonesia, load_landuse_indonesia
+from src.load import load_indonesia, load_landuse_indonesia, load_qcl_world
 qcl = load_indonesia("QCL")   # Area, Item, Element, Unit, year, value, flag — 2010-2024 by default
 qi  = load_indonesia("QI")
 qv  = load_indonesia("QV")
 land = load_landuse_indonesia()   # None if sustain-eda's RL CSV isn't present; full history
 # override the window: load_indonesia("QCL", year_min=2000, year_max=2024)
+
+# Cross-country slice — for benchmarking Indonesia against other producers (nb 05 §5).
+cas = load_qcl_world("Cassava, fresh", ["Yield", "Production", "Area harvested"])
 ```
+`load_qcl_world` reads grow-eda's already-melted global QCL cache
+(`QCL_{ymin}_{ymax}.parquet`, else `QCL_long.parquet`, else melts the raw CSV), drops
+**region aggregates** (`Area Code >= 5000`) and **FAOSTAT's China composite** (code 351,
+which double-counts `China, mainland`), and caches the per-item slice locally. Everything
+else in `src/load.py` is Indonesia-only.
+
+**Peer-scale filter — required, not optional.** Any cross-country yield "frontier" must be
+restricted to producers at a comparable scale (nb 05 uses `>= 50_000 ha` harvested). The
+unfiltered global cassava-yield leader is Guyana on **2,399 ha** — a garden plot, not an
+agronomic target, and using it inflates Indonesia's apparent gap from 20.6% to 32%.
+
 Column names match grow-eda's raw convention (`Area`, `Item`, `Element`, lowercase
 `year`/`value`/`flag`) — copy-paste between the two tracks works without renames.
 
@@ -80,15 +94,22 @@ used in `sustain-eda/src/load.py` for optional datasets) and extend
 `notebooks/` run in order 01→05:
 - 01 load + inventory
 - 02 what it grows (crop mix; rice area-vs-yield: prod −10.4% on −14.8% area, +5.3% yield)
-- 03 when it grows (cropping-intensity proxy 114%→99%; 2015→2024 area decomposition —
+- 03 when it grows (cropping-intensity proxy 114% in 2015 → 96% in 2024; 2015→2024 area decomposition —
   rice, maize, soy, cassava all lost area; + the month-data gap note below)
-- 04 synthesis (findings; being rewritten from a generic go/no-go into the scoped
-  cassava recommendation fed by 05)
+- 04 synthesis (**written**, not placeholder): 01–03 + 05 into one findings page, ending in a
+  scoped go-with-narrowed-scope recommendation. Recomputes its headline numbers in-notebook
+  rather than restating them in prose.
 - 05 cassava substitution (the thesis bridge): structural wheat-zero vs domestic
   staples; cassava production/area/yield trajectory; area-vs-yield decomposition;
-  cassava yield gap vs global frontier; MOCAF flour-equivalent vs wheat demand;
-  realistic 10–20% blend requirement. §7 feeds 04 and deck slide 8.
+  cassava yield gap vs the **peer-scale** frontier; MOCAF flour-equivalent vs wheat demand;
+  the blend × conversion-yield decision matrix for slide 8. §7 feeds 04 and the deck.
 
-Note: cassava **area is declining** — the proposed solution's own raw material is
-under pressure. Keep that tension visible; it's what points policy at yield +
-land-retention rather than "just grow more."
+Outputs beyond figures: `outputs/tables/slide8_mocaf_blend_matrix.csv` (blend rate ×
+MOCAF conversion → fresh cassava needed, % of current crop, wheat avoided, $ saved,
+% fundable by closing the yield gap).
+
+Note: cassava **area is declining** (−53.2% since 2010) — the proposed solution's own raw
+material is under pressure, and the area already lost is a **4.4× larger lever than the
+entire remaining yield gap**. Keep that tension visible; it points policy at land retention
+and processing yield rather than "just grow more" or "farm better." See CONTEXT.md for the
+filled numbers.

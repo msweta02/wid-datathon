@@ -25,6 +25,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from .clean import drop_china_composite
+
 ROOT = Path(__file__).resolve().parents[1]
 RAW = ROOT / "data" / "raw"
 PROCESSED = ROOT / "data" / "processed"
@@ -160,3 +162,69 @@ def save_processed(df: pd.DataFrame, name: str) -> Path:
     df.to_parquet(path, index=False)
     print(f"saved -> {path}")
     return path
+
+
+# --- Cross-country slices -------------------------------------------------
+# Everything above is Indonesia-only. The cassava yield-gap analysis in
+# notebook 05 needs a *multi-country* frontier, so this reads grow-eda's
+# already-melted global QCL cache rather than re-melting the 92MB bulk CSV.
+
+# FAOSTAT mixes real countries with regional/income roll-ups in the same Area
+# column. Region aggregates all carry Area Code >= 5000 ("World" = 5000,
+# continents 5100+, income groups 5800+) — the cheapest reliable filter.
+AREA_CODE_AGGREGATE_MIN = 5000
+
+
+def load_qcl_world(item: str | None = None, elements: list[str] | None = None,
+                   year_min: int = YEAR_MIN, year_max: int = YEAR_MAX,
+                   refresh: bool = False) -> pd.DataFrame:
+    """
+    Load QCL for **all countries** (region aggregates dropped), optionally
+    narrowed to one `item` and a list of `elements`.
+
+    Source preference, cheapest first:
+      1. grow-eda/data/processed/QCL_{year_min}_{year_max}.parquet  (year-filtered)
+      2. grow-eda/data/processed/QCL_long.parquet                   (full history)
+      3. the raw bulk CSV, melted here (slow — last resort)
+
+    When `item` is given, the narrowed slice is cached locally so repeat runs
+    don't touch the multi-hundred-MB global frame at all.
+
+    >>> cas = load_qcl_world('Cassava, fresh', ['Yield', 'Production', 'Area harvested'])
+    """
+    slug = None
+    if item is not None:
+        slug = re.sub(r"[^a-z0-9]+", "_", item.lower()).strip("_")
+        cache = PROCESSED / f"QCL_world_{slug}_{year_min}_{year_max}.parquet"
+        if cache.exists() and not refresh:
+            print(f"[cache] {cache.name}")
+            out = pd.read_parquet(cache)
+            return out[out["Element"].isin(elements)].copy() if elements else out
+
+    ranged = GROW_PROCESSED / f"QCL_{year_min}_{year_max}.parquet"
+    full = GROW_PROCESSED / "QCL_long.parquet"
+    if ranged.exists():
+        print(f"[grow-eda cache] {ranged.name}")
+        world = pd.read_parquet(ranged)
+    elif full.exists():
+        print(f"[grow-eda cache] {full.name} (full history — filtering to {year_min}-{year_max})")
+        world = pd.read_parquet(full)
+    else:
+        path = _find_bulk_csv(BULK_BASENAMES["QCL"], [RAW, GROW_RAW])
+        print(f"[bulk] no grow-eda QCL cache — melting {path} (slow) ...")
+        world = _melt_wide_to_long(pd.read_csv(path, encoding=BULK_ENCODING, low_memory=False))
+
+    world = world[(world["year"] >= year_min) & (world["year"] <= year_max)]
+    if "Area Code" in world.columns:
+        world = world[world["Area Code"] < AREA_CODE_AGGREGATE_MIN]
+    world = drop_china_composite(world)   # 'China' composite double-counts 'China, mainland'
+
+    if item is not None:
+        world = world[world["Item"] == item].copy()
+        if world.empty:
+            raise ValueError(f"No QCL rows for Item={item!r} in {year_min}-{year_max}.")
+        world.to_parquet(cache, index=False)
+        print(f"[world] {item} {year_min}-{year_max}: {len(world):,} rows, "
+              f"{world['Area'].nunique()} countries -> {cache.name}")
+
+    return world[world["Element"].isin(elements)].copy() if elements else world

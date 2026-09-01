@@ -87,3 +87,20 @@ def drop_permanent_crops(df: pd.DataFrame, item_col: str = "Item") -> pd.DataFra
     for pat in PERMANENT_CROP_ITEMS:
         mask |= low.str.contains(pat, regex=False)
     return df[~mask].copy()
+
+
+# --- Cross-country hygiene ------------------------------------------------
+# Only needed once a frame spans multiple countries (see load.load_qcl_world);
+# the Indonesia-only frames above never hit this.
+
+# FAOSTAT ships China three ways at once: 351 "China" (composite = mainland +
+# Taiwan + HK + Macao), 41 "China, mainland", plus the SARs/Taiwan separately.
+# Keeping 351 alongside its parts double-counts China in any ranking.
+CHINA_COMPOSITE_AREA_CODE = 351
+
+
+def drop_china_composite(df: pd.DataFrame) -> pd.DataFrame:
+    """Drop FAOSTAT's 'China' composite, keeping 'China, mainland' + the SARs/Taiwan."""
+    if "Area Code" in df.columns:
+        return df[df["Area Code"] != CHINA_COMPOSITE_AREA_CODE].copy()
+    return df[df["Area"] != "China"].copy()
