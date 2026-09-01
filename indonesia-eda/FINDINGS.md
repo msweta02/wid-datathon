@@ -6,7 +6,10 @@ TRADE / EAT / SUSTAIN are out of scope; where their data is needed it is named a
 `../grow-eda` and `../sustain-eda`. See `CLAUDE.md` for loaders, `CONTEXT.md` for the
 build queue and deck state.
 
-**Status:** notebooks 01–07 all execute end-to-end, 0 errors. 18 figures, 3 tables.
+**Status (2026-09-01):** notebooks 01–07 all execute end-to-end, **0 errors**. 20 figures,
+3 tables, 1 copy deck. `python tools/check_stale_numbers.py` → **exit 0**.
+**Enrichment is closed:** E3 done (§2.5a), E2 closed partially (§2.3a), E1 blocked (§6).
+**Slide 8 is built** (§4a). No further source-chasing planned.
 
 ---
 
@@ -66,6 +69,30 @@ This was the deck's biggest unbacked link. It is answerable inside GROW.
 - **Limit:** national area coincidence, *not* parcel-level conversion. QCL cannot show a given
   cassava field became oil palm. It **can** rule out "there is no land," which is the objection
   the recommendation must clear. Parcel proof needs land-cover data (SUSTAIN).
+
+#### 2.3a External corroboration of the mechanism (task E2) — mechanism yes, magnitude no
+- **On point (USDA GAIN ID2026-0010, p. 20):** **ATR/BPN**, reiterating a BPS report, attributes ongoing
+  paddy-area loss to **conversion to non-agricultural uses — housing, industrial, infrastructure** —
+  concentrated on **Java** (60% of the population). Same structural mechanism §2.3 derives internally.
+- **Field-level substitutability (GAIN pp. 1, 4, 13):** paddy harvested area forecast to **decline in
+  2025/26 and 2026/27** as farmers switch paddy→corn under a potential moderate El Niño, *"since most
+  corn and paddy are grown in the same fields."* External confirmation of the premise the reallocation
+  reading needs — and it puts the El Niño angle on **land use**, not only on supplier risk (§2.7).
+- **A source that disagrees — reported, not buried (FAO GIEWS Indonesia brief, ref. 29-Jan-2026):**
+  opposite near-term sign. 2026 First paddy crop *"area planted … above the five-year average"*; 2025
+  paddy 59 Mt, ~9% above average, *"reflecting a price-driven expansion in the area planted."*
+  Reconciliations, neither settled: **planted vs harvested** are different metrics (drought raises
+  abandonment between them), and **both describe the 2025–27 margin**, not the 2010–2024 structural
+  trend. ⚠ **Never claim "official sources confirm paddy area is falling"** — one of them says otherwise.
+- **Bonus, same GIEWS brief:** wheat imports forecast at a **near-record 11.5 MMT** (2025/26), *"driven by
+  population growth and increasing domestic consumption of wheat-based food products"*; **maize imports
+  1.5 MMT**, well above average, *"reflecting strong demand by the domestic poultry industry."*
+  Independent support for the wheat dependence **and** for §2.6's maize/feed channel.
+- **No hectares-per-year figure is stated anywhere.** The primary series (Kementan *Statistik Lahan
+  Pertanian*, `satudata.pertanian.go.id`) is **Cloudflare-blocked (HTTP 403)**, so the conversion
+  magnitude is unsourced and the mechanism is corroborated **only at second hand** (GAIN → ATR/BPN → BPS).
+  The `~60–80k ha/yr` and `~79,600 ha` figures once staged for this task **did not reconcile** with each
+  other (6 yr × 60–80k = 360–480k ha, not 79.6k) — the cumulative figure appears spurious; don't use it.
 
 ### 2.4 Is cassava even the right lever? (nb 07 §3)
 Tested rather than assumed. Cassava wins **by elimination** — a stronger claim.
@@ -215,17 +242,18 @@ cannot reduce the 12.3 Mt Indonesia must buy; cassava → MOCAF reduces the volu
 
 **Tables** (`outputs/tables/`)
 - `slide8_mocaf_blend_matrix.csv` — blend rate × MOCAF conversion → flour, fresh cassava, % of
-  crop, wheat avoided, $ saved, % fundable by the yield gap
+  crop, wheat avoided, `saved_USDbn_FOB_mean` (basis is in the column name), % fundable by the yield gap
 - `supplier_diversification_scenarios.csv` — sourcing mix → pool volatility, worst year
 - `grow_action_levers.csv` — lever → actor → sized effect
 
-**Key figures** (`outputs/figures/`, 18 total)
+**Key figures** (`outputs/figures/`, 20 total)
 - `idn_staples_vs_wheat_zero` — the structural zero
 - `idn_land_reallocation` ★ — total area grew while staples shrank; oil palm crossover
 - `idn_substitute_candidates` ★ — cassava by elimination
 - `idn_maize_channel` ★ — the second route into wheat dependence
 - `idn_cassava_yield_vs_peers` — Indonesia already #2 of 40
-- `idn_mocaf_blend_requirement` — slide 8 asset
+- `idn_slide8_blend_and_savings` ★ — **the slide-8 deck asset** (cassava cost | USD avoided)
+- `idn_mocaf_blend_requirement` — analytical version of the volume panel
 - `idn_wheat_price_history` — observed wheat prices vs the retired $300/t assumption
 - `idn_supply_supplier_production`, `idn_supply_australia_area_vs_yield`,
   `idn_supply_diversification` — supplier fragility
@@ -237,6 +265,45 @@ cannot reduce the 12.3 Mt Indonesia must buy; cassava → MOCAF reduces the volu
 - `clean.tonnes_only` — `Production` mixes `t` with `1000 No` (eggs); see §5
 - `load.load_wheat_prices()` — World Bank Pink Sheet monthly wheat (external, not FAOSTAT);
   graceful fallback if the workbook is absent; vintage persisted as a column
+
+**Tooling / QA** (`tools/`)
+- `check_stale_numbers.py` — pre-flight guard: greps every notebook's *source* for **retired** figures
+  and exits 1 on any that isn't explicitly allowlisted. Six tracked: the `$300/t` wheat assumption, the
+  `$0.29bn` and `$0.25–0.34bn` figures derived from it, the `40,000 kg/ha` frontier placeholder, the
+  `41`-peer count, and `14.4%`. Each entry records *what it was, what replaced it, and where it is
+  intentionally allowed* — so an allowlist entry is a documented decision, not a silent exception.
+  **Run it before anything goes on a slide.** It has already caught two real survivors (§5.6). Docs are
+  excluded by default: they quote retired values by design.
+
+**Deck copy** (`outputs/`)
+- `slide8_copy.md` — title, subtitle, body beats, the four mandatory footnotes, speaker notes with the
+  six likely challenges pre-answered, and a retired-numbers table for slide assembly.
+
+---
+
+## 4a. Slide 8 — built and sourced
+
+Asset `outputs/figures/idn_slide8_blend_and_savings.png` (2872×1342, 200 dpi): two panels,
+*what the blend costs in cassava* | *what it saves*. Copy in `outputs/slide8_copy.md`.
+`CONTEXT.md` owns the decisions and their reasons; the **result** is:
+
+> **"A 10% wheat-flour blend is reachable on cassava's yield gap alone — 20% is not."**
+
+- **10% blend, lab-grade conversion:** needs 2.83 Mt (18% of crop). The yield gap alone supplies
+  4.06 Mt = **143% of it** → reachable, **no new land and no diversion of today's crop**.
+- **20% blend:** needs 5.66–9.80 Mt = **36–63% of the entire national crop** → not reachable without
+  new land or large-scale diversion.
+- **Savings:** a 10% blend avoids 0.98 Mt of wheat ≈ **USD 0.26bn/yr** at the sourced mean, and
+  0.18–0.35bn across the observed p10–p90 price range. Chart whiskers are *observed* prices, not
+  invented scenarios.
+- Five things changed from the draft slide, each because the data contradicted it: baseline
+  (8.25M t → 9.8 MMT food-wheat), food-stream-only framing, USD not Rp, cap at 20% not 30%, and the
+  added conversion-yield axis + yield-gap line.
+- **Not done:** the `.pptx` was not edited (`python-pptx` absent, and `OtherDetails/` is gitignored so
+  the deck is unversioned — back it up before any programmatic edit). Draft title still reads
+  "MOCA**G**", subtitle has a stray leading "A".
+- ⚠ The draft's **8.25M t** baseline matches no sourced figure. If it appears elsewhere in the deck it
+  needs the same treatment.
 
 ---
 
@@ -251,16 +318,37 @@ cannot reduce the 12.3 Mt Indonesia must buy; cassava → MOCAF reduces the volu
    **hen eggs as Indonesia's #2 "crop" by production**. Fixed via `clean.tonnes_only`.
 4. **Two `''`-in-f-string bugs** (nb 05) — terminated the f-string early, printing literal
    `{cur_area:,.0f}` instead of the value.
+5. **Unsourced wheat price** (nb 05 §6) — `$300/t` "CIF assumption" plus a hand-picked
+   `[250, 300, 350]` band, replaced in E3 by the observed Pink Sheet series (§2.5a). The assumption sat
+   at the **70th percentile** of real history, so it was **inflating** the savings, not being cautious.
+6. **Retired price figures that survived E3** — E3 fixed nb 05 §6 but left stale copies elsewhere:
+   nb 04 §3 still read *"~$0.29bn/yr at $300/t"* and still listed the price as an open gap, and
+   **nb 05's own §7** still carried *"~$0.25–0.34bn/yr ($250–350/t)"* plus a `$300/t CIF assumption`
+   caveat. All updated to the sourced figure **with the FOB basis label attached**. Found by
+   `tools/check_stale_numbers.py`, not by re-reading — which is the argument for having it.
+7. **Inconsistent blend upper bound** — nb 04 said `8.3–14.4%` where nb 05 computes `14.35% → 14.3%`
+   and both other docs said 14.3%. Aligned to **14.3%**.
+8. **Mathtext-mangled figure footnote** (nb 05 slide-8 asset) — matplotlib parses paired `$` as
+   mathtext, so an unescaped currency footnote silently italicised and ate its own spacing; literal
+   `**bold**` markdown also rendered as asterisks. Currency is now spelled `USD` inside long figure
+   strings. Recorded in `CLAUDE.md`.
 
 ---
 
 ## 6. Honest limits and remaining gaps
 
 **Cannot be closed with this data**
-- **Sub-national / island-level analysis.** FAOSTAT is national-only. Java rice vs
-  Sumatra/Kalimantan oil palm is exactly where the land-competition story lives, and a national
-  aggregate hides it. Needs Indonesian **BPS provincial** data. *This is the only GROW-rubric item
-  not covered.*
+- **Sub-national / provincial analysis — THE TOP REMAINING GAP (task E1: attempted, blocked).**
+  FAOSTAT is national-only, and Java rice vs Sumatra/Kalimantan oil palm is exactly where the
+  land-competition story lives. Attempted and abandoned for a documented reason, not overlooked:
+  - **BPS** publishes provincial harvested area for **rice (table 119) and maize (table 137) only —
+    no cassava**, the crop the thesis turns on; coverage **2019–2025**, single-year, behind an
+    **account/API gate** (`bps.go.id/en/statistics-table?subject=557`).
+  - **Kementan's** fuller provincial series (`satudata.pertanian.go.id`) is **Cloudflare-blocked (403)**.
+  - So the reachable half can't answer a cassava question, and the half that could isn't reachable.
+  - **Consequence:** §2.3's reallocation stays a **national-total coincidence**, never spatially proven.
+    Say "national data cannot localise this"; don't imply province-level co-location.
+  *This is the only GROW-rubric item not covered.*
 - **Sago** — a real regional flour staple with no FAOSTAT Indonesian series. Unsized.
 - **Month-level crop calendar** — QCL/QI/QV/RL are annual; nb 03 uses cropping intensity as an
   explicit proxy. Real fix is FAO's Crop Calendar tool.

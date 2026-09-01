@@ -108,10 +108,25 @@ Closes the two gaps this file previously called the deck's weakest links.
 
 ## Deliverable state (`Indonesia.pptx`, 11 slides — spine locked)
 Open items, ranked:
-1. **Slide 8 (MOCAF blending/savings matrix)** — numbers now exist. Build the slide from
-   `outputs/tables/slide8_mocaf_blend_matrix.csv` + `outputs/figures/idn_mocaf_blend_requirement.png`
-   (blend x conversion yield -> fresh cassava, % of crop, wheat avoided, $ saved, % fundable by the
-   yield gap). **Still a slide-build task, no longer a data task.**
+1. ~~**Slide 8 (MOCAF blending/savings matrix)**~~ — **ASSET BUILT 2026-09-01.**
+   `outputs/figures/idn_slide8_blend_and_savings.png` (two panels: cassava cost | USD saved) backed by
+   `outputs/tables/slide8_mocaf_blend_matrix.csv`. **Takeaway on the slide:** *"A 10% wheat-flour blend
+   is reachable on cassava's yield gap alone — 20% is not."*
+   Five decisions taken against the DRAFT slide, all reversible but each with a reason:
+   - **Baseline = GAIN food-wheat 9.8 MMT**, not the draft's `8.25M t` (which matches no sourced figure:
+     not GAIN total 11.6, food 9.8, imports 10.45/12.3, nor GIEWS 11.5 — it appears unsourced).
+   - **Baseline is the FOOD stream, not total imports.** The draft's declining "remaining wheat imports"
+     line implies 1:1 substitution against all imports; MOCAF cannot touch the ~2.1 MMT feed stream
+     (nb 07 §4), so that framing overstates.
+   - **USD, not Rp trillion.** Rp would stack an FX assumption on top of the FOB/CIF one.
+   - **Capped at 20%.** The draft ran to 30%; our own numbers say 20% already needs 36-63% of the entire
+     crop, so showing 30% would contradict the analysis.
+   - **Added the two strongest things the draft omitted:** the **conversion-yield axis** (20% sun-dried vs
+     34.6% lab nearly halves the cassava needed — lever A) and the **yield-gap headroom line**
+     (+4.06 Mt), which is what makes the 10%-vs-20% verdict visible.
+   Residual: draft title reads "MOCA**G**" and the subtitle has a stray leading "A" — fix in the deck.
+   Deck edit itself (.pptx) NOT done — `python-pptx` isn't installed and `OtherDetails/` is gitignored,
+   so the deck is unversioned; back it up before any programmatic edit.
 2. **El Nino angle** — now has a data home: nb 06 §4 shows Australia's production is yield-driven
    (yield CV 2.2x area CV), so climate variance *is* the supply risk. Pair the BMKG 50-60% moderate
    El Nino mid-2026 forecast with that chart rather than leaving it as background colour. Keep the
@@ -165,32 +180,67 @@ to pull, a guardrail, and the expected output. Verify every number at the primar
 lands in a notebook or the deck (some were surfaced via aggregators — see CLAUDE.md provenance rule).
 Ranked by analytical value. None changes the thesis; all harden it against a judge's probing.
 
-- **E1 — Provincial reallocation overlay (BPS). HIGHEST VALUE, HIGHEST EFFORT.**
-  - *Why:* closes nb 07's standing caveat — currently reallocation is national-total coincidence; this
-    tests spatial co-location. If staple-area decline concentrates in the SAME provinces as oil-palm
-    expansion (Sumatra/Kalimantan), the mechanism goes from "both happened nationally" to "happened in
-    the same places." Also surfaces an honest complication: cassava land (Lampung/Java) and palm land
-    (Sumatra/Kalimantan) may not be the same land — say so if the data shows it.
-  - *Source:* BPS province tables — rice https://www.bps.go.id/en/statistics-table?subject=557 ;
-    cassava/maize via provincial BPS sites (top cassava provinces: Lampung, Central Java, East Java).
-  - *Do:* new `src/load.py` loader for BPS provincial CSVs (follow the try_read graceful-fallback
-    pattern); a notebook section mapping/tabulating staple-area Δ vs palm-area Δ by province.
-  - *Guardrail:* BPS rice methodology breaks at KSA (2018) and moves monthly (Mar 2025) — verify vintage
-    across 2010–2024, don't splice methods silently. BPS≠FAOSTAT totals (different method); label which.
-  - *Out:* province-level Δarea table + figure; one sentence on whether the reallocation is spatially matched.
+- **E1 — Provincial reallocation overlay (BPS). ATTEMPTED 2026-09-01 — BLOCKED, NOT DONE.**
+  **This is now the top remaining data gap on the track.** Documented here so it reads as a scoped
+  limitation with known cost, not an oversight.
+  - *Still the highest-value gap:* nb 07 §2 establishes reallocation as a **national-total coincidence**.
+    Province-level data would test spatial co-location — if staple-area decline concentrates in the same
+    provinces as oil-palm expansion, the mechanism moves from "both happened nationally" to "happened in
+    the same places". It would also surface the honest complication that cassava land (Lampung, Java) and
+    palm land (Sumatra, Kalimantan) may simply not be the same land.
+  - *Why blocked — exact source state as checked:*
+    - **BPS** exposes provincial **harvested area for rice (table 119) and maize (table 137) only** —
+      **no cassava**, which is the crop the whole thesis turns on. Coverage is **2019–2025** (not the
+      2010–2024 window the internal analysis uses) and single-year, behind an **account/API gate**.
+      Landing page: `bps.go.id/en/statistics-table?subject=557`.
+    - **Kementan's** fuller provincial series (`satudata.pertanian.go.id`) is **Cloudflare-blocked**
+      (HTTP 403 on both the file and the portal root, with and without a browser user-agent).
+    - Net: the accessible half (rice + maize, 2019–2025) cannot answer a **cassava** reallocation
+      question, and the half that could is not reachable. Pulling it was judged not worth the effort.
+  - *What it would take to unblock:* a BPS account/API key for the provincial tables **plus** a cassava
+    provincial series (provincial BPS offices publish these separately), or manual retrieval of the
+    Kementan PDF from a browser session.
+  - *Guardrail if it is ever done:* BPS rice methodology breaks at **KSA (2018)** and moved to monthly
+    tables (Mar 2025) — verify vintage across the window, never splice methods silently. BPS totals
+    differ from FAOSTAT (different method) — label which is which.
+  - *Consequence for the deck:* no island/province claim may come from this repo. Say "national data
+    cannot localise this" rather than implying the reallocation is spatially proven.
 
-- **E2 — Land-conversion corroboration (Kementan / ATR-BPN). MEDIUM VALUE, LOW EFFORT.**
-  - *Why:* nb 07 infers reallocation from QCL area math alone. Indonesia's own land agency reporting
-    ~60–80k ha/yr net paddy loss is independent, government-sourced confirmation — makes the finding
-    un-dismissable and gives a real driver (Java sawah loss to housing/infrastructure) for the effect
-    QCL can only show.
-  - *Source:* Statistik Lahan Pertanian PDF,
-    https://satudata.pertanian.go.id/assets/docs/publikasi/Statistik_Lahan_Pertanian_Tahun_2015-2019.pdf
-    (+ newer editions if present); ATR/BPN net-loss figure ~60–80k ha/yr, cumulative ~79,600 ha 2019–2024.
-  - *Do:* add as a sourced constant + citation in nb 07 §2 alongside the internal palm-expansion math;
-    NOT a new dataset to model — a corroborating external reference.
-  - *Guardrail:* net vs gross conversion differ (60k/80k/100–150k ha/yr) — quote the NET series, state it.
-  - *Out:* one referenced paragraph in nb 07 §2 + FINDINGS; strengthens, doesn't replace, the QCL finding.
+- ~~**E2 — Land-conversion corroboration**~~ — **CLOSED 2026-09-01, partially: mechanism corroborated,
+  magnitude not.** The named primary source was unreachable, so the scope was cut honestly rather than
+  approximated. Added as a referenced markdown section at the end of **nb 07 §2**.
+  - *What went in (all verified at origin, quotes checked):*
+    - **USDA GAIN ID2026-0010, p. 20** — **ATR/BPN**, reiterating a BPS report, attributes ongoing paddy
+      area loss to **conversion to non-agricultural uses (housing, industrial, infrastructure)**,
+      concentrated on **Java** (60% of population). On-point corroboration of §2's structural mechanism.
+    - **GAIN pp. 1, 4, 13** — paddy harvested area forecast to **decline in 2025/26 and 2026/27** as
+      farmers switch paddy->corn under a potential moderate El Nino, *"since most corn and paddy are grown
+      in the same fields"*. External confirmation that cropland is **substitutable between crops at field
+      level** — the premise the reallocation reading needs. Also links El Nino to land use, not just to
+      supplier risk (nb 06).
+  - *A source that DISAGREES, reported not buried:* **FAO GIEWS Indonesia Country Brief (ref.
+    29-Jan-2026)** gives the opposite near-term sign — 2026 First paddy crop *"area planted ... above the
+    five-year average"*, and 2025 paddy 59 Mt (~9% above average) *"reflecting a price-driven expansion in
+    the area planted"*. Two reconciliations, neither settled here: **planted vs harvested area** are
+    different metrics (drought raises abandonment between them), and **both sources describe the 2025–27
+    margin**, not the 2010–2024 structural trend. **Do not put "official sources confirm paddy area is
+    falling" on a slide** — one of them says the opposite.
+  - *Bonus corroboration of the wider thesis (GIEWS, same brief):* wheat imports forecast at a
+    **near-record 11.5 MMT** in 2025/26 *"driven by population growth and increasing domestic consumption
+    of wheat-based food products"*, and **maize imports 1.5 MMT**, well above average, *"reflecting strong
+    demand by the domestic poultry industry"* — independent support for both the wheat dependence AND
+    nb 07 §4's maize/feed channel.
+  - *Guardrail honoured:* **no hectares-per-year conversion figure was stated.** The `~60-80k ha/yr` and
+    `~79,600 ha (2019-2024)` figures previously listed in this file were **not** verifiable at the primary
+    portal (see below), so they were kept out of the notebook entirely.
+  - *Access gap, documented in the notebook itself:* Kementan *Statistik Lahan Pertanian* on
+    `satudata.pertanian.go.id` returns **HTTP 403 (Cloudflare)** on both the PDF and the portal root;
+    `www.pertanian.go.id` soft-404s the same path. So the conversion mechanism is corroborated **only at
+    second hand** (GAIN -> ATR/BPN -> BPS), and the magnitude is unsourced.
+  - *Correction to this file's own prior numbers:* the two figures staged for E2 **did not reconcile** —
+    six years at 60-80k ha/yr is 360-480k ha, not ~79,600 ha (which implies ~13.3k ha/yr, ~5x lower).
+    GAIN p. 20 carries the **60-80k ha/yr** rate but says nothing about a 79,600 ha cumulative; that
+    cumulative figure appears spurious or differently scoped and should not be used.
 
 - ~~**E3 — Wheat-price fix (World Bank Pink Sheet)**~~ — **DONE 2026-09-01.** Verified at origin
   (HRW Jul-2026 = $310.00/mt exactly, vintage "Updated on August 04, 2026").
@@ -210,7 +260,8 @@ Ranked by analytical value. None changes the thesis; all harden it against a jud
   - *Also found:* the Pink Sheet download URL rotates its vintage token and an old token serves data
     that stops years early. Don't hardcode the URL.
 
-Order to build: ~~E3~~ **done** → **E2 next (fast, safe)** → E1 (high-reward, higher risk). If short on time
+Build order status: ~~E3 done~~ → ~~E2 closed (mechanism only)~~ → **E1 blocked, top remaining gap.**
+Enrichment is now CLOSED — no further source-chasing. Next work is deck build (slide 8). If short on time
 before the deadline, E2+E3 are cheap and defensible; E1 is the one that adds genuinely new insight but
 needs BPS data pulled and the methodology break handled.
 

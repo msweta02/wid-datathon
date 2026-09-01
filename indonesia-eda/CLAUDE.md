@@ -74,6 +74,27 @@ Same as `grow-eda`: reusable code in `src/`, notebooks stay thin, figures →
 `outputs/figures/`, cached frames → `data/processed/*.parquet` (never re-melt
 the full global CSV if the country-filtered cache already exists).
 
+## Pre-flight check — run this before anything goes on a slide
+```bash
+python tools/check_stale_numbers.py        # exit 1 if a retired number survives anywhere
+python tools/check_stale_numbers.py -v     # also list the allowlisted (intentional) mentions
+python tools/check_stale_numbers.py --all  # include CLAUDE/CONTEXT/FINDINGS (they quote retired
+                                           # values by design, so expect hits there)
+```
+Several figures here have been **superseded**, and the risk isn't that they were wrong — they're
+fixed — it's that a stale copy survives in one notebook's prose and gets read out on a slide.
+It already caught two: nb 05's own §7 was still carrying `$0.25–0.34bn ($250–350/t)` after E3
+had replaced it in §6.
+
+Currently tracked as retired: the `$300/t` wheat assumption, the `$0.29bn` / `$0.25–0.34bn`
+savings figures derived from it, the `40,000 kg/ha` frontier placeholder, the `41`-peer count
+(pre-China-composite fix), and the `14.4%` blend upper bound.
+
+**When you retire a number, add it to `RETIRED` in that script** — that is what makes the check
+outlive whoever remembers the change. Intentional mentions go in the entry's `allow` list with a
+marker substring, so an allowlist entry is a *recorded decision* rather than a silent exception.
+The script deliberately does not infer intent from surrounding words.
+
 ## Known gap — "when it grows"
 FAOSTAT (QCL/QI/QV/RL) is **annual only** — there is no planting/harvest month
 data in anything downloaded so far. `03_when_it_grows` is honest about this:
@@ -169,8 +190,15 @@ not the aggregator that reported it. Label all three as external, exactly as we 
   **maize→feed-wheat channel** (a second, independent route into wheat imports that MOCAF cannot
   touch). Ends in the ranked, sized action set for GROW rubric point 3.
 
+**Deck asset for slide 8:** `outputs/figures/idn_slide8_blend_and_savings.png` — two panels
+(cassava required | USD bn avoided), takeaway *"a 10% blend is reachable on the yield gap alone,
+20% is not"*. Baseline is **food-wheat 9.8 MMT, not total imports**; money is **USD on the Pink
+Sheet FOB basis**; capped at a 20% blend. Decisions and their reasons are in CONTEXT.md.
+Note: matplotlib parses paired `$` as mathtext, so spell currency as `USD` inside long
+figure strings — an unescaped `$…$` silently italicises and eats the spacing.
+
 Outputs beyond figures: `outputs/tables/slide8_mocaf_blend_matrix.csv` (blend rate ×
-MOCAF conversion → fresh cassava needed, % of current crop, wheat avoided, $ saved,
+MOCAF conversion → fresh cassava needed, % of current crop, wheat avoided, USD saved (FOB basis),
 % fundable by closing the yield gap) and
 `outputs/tables/supplier_diversification_scenarios.csv` (sourcing mix → supply-pool
 volatility and worst single year), and `outputs/tables/grow_action_levers.csv`
