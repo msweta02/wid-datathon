@@ -43,7 +43,8 @@ land = load_landuse_indonesia()   # None if sustain-eda's RL CSV isn't present; 
 # override the window: load_indonesia("QCL", year_min=2000, year_max=2024)
 
 # Cross-country slice — for benchmarking Indonesia against other producers (nb 05 §5).
-cas = load_qcl_world("Cassava, fresh", ["Yield", "Production", "Area harvested"])
+cas   = load_qcl_world("Cassava, fresh", ["Yield", "Production", "Area harvested"])  # nb 05 §5
+wheat = load_qcl_world("Wheat", ["Yield", "Production", "Area harvested"])           # nb 06
 ```
 `load_qcl_world` reads grow-eda's already-melted global QCL cache
 (`QCL_{ymin}_{ymax}.parquet`, else `QCL_long.parquet`, else melts the raw CSV), drops
@@ -89,9 +90,14 @@ used in `sustain-eda/src/load.py` for optional datasets) and extend
   relative to rice; cross-check against QV (value) and calorie-relevant volume.
 - Same **flag** and **item-aggregate** (`"Cereals, primary"`, `"Fruit Primary"`, etc.)
   gotchas as grow-eda apply here — `src/clean.py` carries over the relevant helpers.
+- **No trade data in this repo.** QCL/QI/QV/RL are production-side only; FAOSTAT's trade
+  domain (TM / detailed trade matrix) is not downloaded. So import volumes and supplier
+  shares are **carried in as sourced constants** (deck slides 3–4, USDA GAIN) — see nb 06 §1.
+  Never present a supplier share as if this repo derived it. Adding a TM loader is the single
+  highest-value data addition left for this track.
 
 ## Workflow
-`notebooks/` run in order 01→05:
+`notebooks/` run in order 01→06:
 - 01 load + inventory
 - 02 what it grows (crop mix; rice area-vs-yield: prod −10.4% on −14.8% area, +5.3% yield)
 - 03 when it grows (cropping-intensity proxy 114% in 2015 → 96% in 2024; 2015→2024 area decomposition —
@@ -104,9 +110,16 @@ used in `sustain-eda/src/load.py` for optional datasets) and extend
   cassava yield gap vs the **peer-scale** frontier; MOCAF flour-equivalent vs wheat demand;
   the blend × conversion-yield decision matrix for slide 8. §7 feeds 04 and the deck.
 
+- 06 supplier side (the *other* half of the deck's argument): who actually grows Indonesia's
+  wheat and how reliably. Supplier production levels/volatility, Australia's yield-vs-area
+  swing, the shock-correlation test → quantified diversification benefit, and the
+  tradeable-pool framing. Feeds deck slides 3–5.
+
 Outputs beyond figures: `outputs/tables/slide8_mocaf_blend_matrix.csv` (blend rate ×
 MOCAF conversion → fresh cassava needed, % of current crop, wheat avoided, $ saved,
-% fundable by closing the yield gap).
+% fundable by closing the yield gap) and
+`outputs/tables/supplier_diversification_scenarios.csv` (sourcing mix → supply-pool
+volatility and worst single year).
 
 Note: cassava **area is declining** (−53.2% since 2010) — the proposed solution's own raw
 material is under pressure, and the area already lost is a **4.4× larger lever than the

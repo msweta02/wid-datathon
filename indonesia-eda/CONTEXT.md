@@ -47,15 +47,49 @@ The real peer frontier is 35,574 kg/ha and the raw global ranking is topped by m
 (Guyana, 2,399 ha). Notebook 05 now filters to producers >=50k ha so the frontier is one Indonesia
 could copy. Net effect: the yield story got *smaller*, and the land-retention story got bigger.
 
+## Filled findings from notebook 06 — supplier side (RUN 2026-09-01)
+Production-side backing for the deck's supply-chain-fragility argument (slides 3-5).
+- **Suppliers are mid-sized, not giants.** Australia 34.1 Mt, Canada 35.9 Mt, Ukraine 22.4 Mt (2024)
+  = **11.6% of world wheat** between them. Indonesia's security rests on a narrow slice.
+- **All three top suppliers have lost >=34% of their crop in a single year since 2010**:
+  Australia **-34%** (2017), Canada **-37%** (2021), Ukraine **-36%** (2022). Three shocks in
+  fifteen years, one per supplier — not a tail risk.
+- **The largest supplier is the least reliable.** Australia CV **26.5%** (highest of any major
+  producer checked), swinging **14.5 -> 41.2 Mt** (2.8x).
+- **Australia's swing is yield, not area** (yield CV 21.9% vs area CV 10.1%; corr(yield, prod)
+  = +0.95 vs corr(area, prod) = +0.65). Steady footprint, wildly variable harvest => weather risk
+  that no contract or acreage policy hedges. **This is where the El Nino / IOD angle belongs.**
+- **Shocks are uncorrelated** (Aus-Ukr **-0.09**, Ukr-Can **-0.34**, Aus-Can **+0.20**) and land in
+  different years => diversification is genuinely protective, and now quantified:
+  Australia-only CV **26.5%** -> actual GAIN mix **14.9%** -> equal-weight top-3 **11.6%**
+  (a further **22% relative** cut; worst single year -20% -> -15%).
+- **Indonesia is not a marginal buyer.** 10.45 Mt = **31% of Australia's**, **47% of Ukraine's**,
+  **29% of Canada's** entire 2024 crop. Mutual dependency = leverage, but no quiet spare capacity.
+- **The tradeable pool is ~1/3 of world production.** China+India+Pakistan grow **36%** of world
+  wheat and export almost none; the 7 major exporters are **34%**. "The world grows plenty of
+  wheat" is not a comfort available to Indonesia.
+
+**Two-track framing this unlocks:** supplier rebalancing is cheap/fast and worth a **~22% cut in
+supply volatility** but cannot reduce the 12.3 Mt Indonesia must buy; cassava->MOCAF reduces the
+volume but is bounded at an **8-14% blend** land-neutral. Present as two tracks with the volatility
+number on one and the blend band on the other. Neither is sufficient alone.
+
 ## Deliverable state (`Indonesia.pptx`, 11 slides — spine locked)
 Open items, ranked:
 1. **Slide 8 (MOCAF blending/savings matrix)** — numbers now exist. Build the slide from
    `outputs/tables/slide8_mocaf_blend_matrix.csv` + `outputs/figures/idn_mocaf_blend_requirement.png`
    (blend x conversion yield -> fresh cassava, % of crop, wheat avoided, $ saved, % fundable by the
    yield gap). **Still a slide-build task, no longer a data task.**
-2. **El Nino angle underused** — live 2026 event, makes vulnerability timely not historical.
-3. **Supplier % reconciliation** — OEC $-share vs GAIN volume-share (Australia 37.8% /
-   Ukraine 18.3% / Canada 16.1%, Jul'25-Jan'26) differ. Pick one basis, footnote it.
+2. **El Nino angle** — now has a data home: nb 06 §4 shows Australia's production is yield-driven
+   (yield CV 2.2x area CV), so climate variance *is* the supply risk. Pair the BMKG 50-60% moderate
+   El Nino mid-2026 forecast with that chart rather than leaving it as background colour. Keep the
+   deck's correct nuance that the 2018-19 drought was IOD-led, not El Nino.
+3. ~~**Supplier % reconciliation**~~ — **resolved in nb 06 §1.** Slide 4's FAOSTAT calendar-2024
+   split (Australia 25.5% / Ukraine 21.3%) and GAIN's Jul'25-Jan'26 split (37.8 / 18.3 / 16.1) are
+   both *volume* bases; they differ by **window, not method** — GAIN's marketing year opens right
+   after Australia's Nov-Jan harvest, which is when Australian share peaks. **Quote GAIN** for
+   "who supplies Indonesia today", use slide 4's series only for the historical-instability point,
+   footnote the window on both, and don't average them.
 4. **Forecast caveat** — linear-only is fine for 15 points; keep the overfitting note visible.
 5. **New: reframe the "grow more cassava" ask.** The data does not support a pure yield pitch —
    Indonesia is already #2 of 40 peers. Slide language should be land retention + processing yield.
@@ -78,7 +112,11 @@ Still open:
 2. **Why did cassava area fall 53%?** Not answerable in QCL — needs SUSTAIN's land-cover data
    (oil palm? urbanisation?). This is *the* determinant of whether MOCAF can scale, and currently
    the deck's biggest unbacked link.
-3. **Optional GROW extensions** — cassava production concentration (supply security of the substitute
+3. **Download FAOSTAT trade (TM / detailed trade matrix).** Now the biggest data gap on this track:
+   nb 06 has to carry supplier shares in as constants, so it cannot verify the deck's own two bases
+   or compute Indonesia-specific import concentration (HHI) directly. Would also let the $/t import
+   price in item 1 come from observed unit values.
+4. **Optional GROW extensions** — cassava production concentration (supply security of the substitute
    itself); QV value angle (cassava worth more as flour than tapioca? QV has cassava at $4.76bn);
    tie land-conversion (SUSTAIN) to the cassava area decline in nb 03/05.
 
@@ -93,3 +131,8 @@ Still open:
   blend on no new land" — real, bounded, and 4.4x smaller than the area already lost.
 - Any yield "frontier" must be **peer-scale filtered**. The unfiltered global leader is Guyana on
   2,399 ha; using it inflates the gap and the whole opportunity.
+- **Supplier shares are not ours.** They come from the deck/GAIN, not from this repo's data (no trade
+  domain downloaded). Label them as external wherever they appear.
+- The nb 06 diversification metric is **production-side only** — it ignores freight, wheat
+  protein/quality class (Australian ASW vs Canadian CWRS aren't interchangeable for every miller),
+  and contract availability. Don't present "rebalance to equal weights" as costless.
