@@ -31,7 +31,7 @@ is not a credible ask. Notebooks 01–07 establish that, bound it, and price it.
 | Supplier concentration | Australia 37.8% · Ukraine 18.3% · Canada 16.1% — and **all three lost ≥34% of their crop in a single year** since 2010 |
 | Rebalancing to an even split | cuts supply volatility **CV 15.0% → 11.6%** (shocks are uncorrelated) |
 
-Full detail, including every caveat: **[`FINDINGS.md`](FINDINGS.md)**.
+Full detail: **[`FINDINGS.md`](FINDINGS.md)**. Caveats are in *Honest limits* at the end of this file.
 
 ---
 
@@ -41,7 +41,7 @@ This track keeps its prose in strict lanes. Read the one you need:
 
 | File | Owns | Read it when |
 |---|---|---|
-| **[`FINDINGS.md`](FINDINGS.md)** | **Results** — every finding, number, correction, limit | You want to know *what we found* |
+| **[`FINDINGS.md`](FINDINGS.md)** | **Results** — the findings and the recommendation | You want to know *what we found* |
 | **[`CLAUDE.md`](CLAUDE.md)** | **Infrastructure** — loaders, conventions, FAOSTAT gotchas | You're going to run or extend the code |
 | **[`CONTEXT.md`](CONTEXT.md)** | **Build queue & deck state** — what's done, what's open | You're picking up the work |
 | `README.md` (this) | **Orientation** | You just arrived |
@@ -110,35 +110,14 @@ px   = load_wheat_prices()          # World Bank Pink Sheet; None if the workboo
 
 Column names match grow-eda's raw convention, so code copies between tracks without renames.
 
-### Two rules that are load-bearing
+### One methodology choice worth knowing
 
-**Peer-scale filter — required, not optional.** Any cross-country yield "frontier" must be
-restricted to producers at comparable scale (`>= 50_000 ha`). Unfiltered, the global cassava-yield
-leader is **Guyana on 2,399 ha** — a garden plot, not an agronomic target — which inflates
-Indonesia's apparent gap from 20.6% to 32%.
+Cross-country yield comparisons are restricted to producers at **comparable scale (≥ 50,000 ha
+harvested)**. This is what the "#2 of 40" claim rests on. Without that filter the global
+cassava-yield leader is Guyana on 2,399 hectares — a garden plot rather than an agronomic target —
+which would put Indonesia's gap at 32% instead of 20.6%.
 
-**`Production` mixes units.** Crops are in tonnes, eggs in `1000 No`, and `Hen eggs in shell,
-fresh` appears under *both*. Grouping by `Item` alone summed 146bn eggs into the tonnage and ranked
-eggs as Indonesia's #2 "crop". Always `clean.tonnes_only(df)` before a tonnage ranking.
-
-`CLAUDE.md` carries the rest of the gotchas.
-
----
-
-## Pre-flight check
-
-```bash
-python tools/check_stale_numbers.py       # exit 1 if a retired number survives anywhere
-python tools/check_stale_numbers.py -v    # also list the intentional, allowlisted mentions
-```
-
-Several figures here were **superseded** during the analysis. The risk isn't that they were wrong —
-they're fixed — it's that a stale copy survives in one notebook's prose and gets read out on a
-slide. This makes that mechanical instead of a memory test, and it has already caught two.
-
-Tracked: the `$300/t` wheat assumption, the `$0.29bn` / `$0.25–0.34bn` figures derived from it, the
-`40,000 kg/ha` frontier placeholder, the `41`-peer count, and the `14.4%` blend bound.
-**When you retire a number, add it to `RETIRED` in that script.**
+See `CLAUDE.md` for loader details and FAOSTAT data conventions.
 
 ---
 

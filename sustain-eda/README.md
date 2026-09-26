@@ -120,24 +120,6 @@ lives in `src/` where it's importable and testable; notebooks orchestrate and na
 
 ---
 
-## Data gotchas
-
-These have all bitten. `CLAUDE.md` has the working notes.
-
-- **M49 aggregates hide among countries.** `Area` mixes real countries with World, regions and
-  income groups. Always run `clean.split_countries_aggregates` and rank on the countries frame.
-- **Two item-coding systems.** Emissions *totals* use `Item Code`; emissions *intensities* use
-  `Item Code (CPC)`. **Never join on item code** — align on `Area` + `Year` and match by name.
-- **CO2eq comparability.** Totals span several gases. Pick a CO2eq element
-  (`clean.pick_co2eq_element`) before summing across sources, and confirm which one was selected —
-  auto-selection can land on a single-gas element.
-- **Recent years are partial.** `clean.pick_analysis_year` takes the latest year at ≥90% of peak
-  country coverage, rather than the newest year present.
-- **Flags.** `Flag Description` separates estimated from official values. In the intensities data,
-  estimated values *outnumber* official ones roughly 6:1 — worth stating whenever you quote one.
-
----
-
 ## Layout
 
 ```

@@ -117,23 +117,6 @@ forces a re-melt; `search_dirs=[...]` points elsewhere.
 
 ---
 
-## FAOSTAT gotchas
-
-These have all bitten. `CLAUDE.md` has the full list.
-
-- **Flags.** Every value carries one (A=official, E=estimated, I=imputed, M=missing). Don't treat
-  imputed values as ground truth without saying so.
-- **China appears several times over** — mainland (41), Taiwan (214), China+Taiwan (357), and a
-  composite including Hong Kong and Macao. **Pick one convention and don't double-count.**
-- **Aggregates hide among countries.** Area codes ≥5000 are regional or income groupings ("World",
-  "Africa", "Least Developed Countries"). Split them out before any ranking.
-- **Yield units.** This release reports `kg/ha`; older docs say `hg/ha`. Always read the unit column.
-- **Item aggregates.** "Cereals, Total" is a roll-up of individual cereal items — ranking without
-  excluding these double-counts.
-- **Coverage is uneven before 1990** for many developing countries.
-
----
-
 ## Layout
 
 ```

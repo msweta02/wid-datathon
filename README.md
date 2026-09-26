@@ -125,23 +125,8 @@ first run is slow.
 
 ## Where to start reading
 
-1. **[`indonesia-eda/FINDINGS.md`](indonesia-eda/FINDINGS.md)** — every finding, number, correction
-   and known limit from the main analysis, in one place. If you read one file, read this.
+1. **[`indonesia-eda/FINDINGS.md`](indonesia-eda/FINDINGS.md)** — the findings and the
+   recommendation, in one place. If you read one file, read this.
 2. **[`indonesia-eda/README.md`](indonesia-eda/README.md)** — how that track is built.
 3. **[`grow-eda/README.md`](grow-eda/README.md)** — the scan that chose the focus.
 4. **[`sustain-eda/README.md`](sustain-eda/README.md)** — the SUSTAIN track.
-
-## Before quoting a number
-
-Some figures were revised during the analysis, so **earlier deck drafts carry superseded values**.
-`indonesia-eda/FINDINGS.md` §5 maps each old number to its replacement, and:
-
-```bash
-cd indonesia-eda && python tools/check_stale_numbers.py
-```
-
-fails if a retired number has survived anywhere in the notebooks.
-
-Where the data cannot answer something, the notebooks say so rather than estimating — FAOSTAT is
-national-only and annual, and this repo holds no trade-flow data. Limits are named in each track's
-README and in `FINDINGS.md` §6.
