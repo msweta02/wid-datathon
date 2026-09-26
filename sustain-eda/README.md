@@ -1,90 +1,160 @@
-# sustain-eda
+# SUSTAIN Track — Emissions, Land Use & Planet Health
 
-**Datathon 2026 · Sustain track — Emissions, land use & planet health**
+Exploratory analysis for the WiD 2026 "Farm to Fork" datathon, **SUSTAIN track**.
 
 > *What is the environmental footprint of how we feed ourselves?*
 
-EDA of FAOSTAT emissions and land-use data to (1) pinpoint the high-impact footprint of food
-production, (2) quantify its cost and locate the biggest levers, and (3) set up a strategy
-that lowers impact without harming output.
+Three deliverables, in order: **(1) Explore** — locate the high-impact footprint. **(2) Quantify** —
+size its cost and find the biggest levers. **(3) Strategize** — set up a mitigation angle that
+lowers impact without cutting output.
 
-## Structure
-
-```
-sustain-eda/
-├── data/
-│   ├── raw/            # FAOSTAT CSVs as downloaded (git-ignored)
-│   └── processed/      # cleaned/derived tables
-├── notebooks/
-│   ├── 01_sources_and_countries.ipynb  # scoping: footprint, rankings, levers
-│   ├── 02_gases.ipynb                  # CH4 vs N2O vs CO2 — which gas drives it
-│   ├── 03_normalization.ipynb          # per-capita & per-calorie (needs extra data)
-│   ├── 04_lever_gap.ipynb              # best- vs worst-in-class intensity (signature metric)
-│   └── 05_candidate_comparison.ipynb   # compare angles, pick the project focus
-├── src/
-│   ├── load.py         # read FAOSTAT normalized CSVs (encoding-robust)
-│   ├── clean.py        # M49 aggregate filtering, year & element selection
-│   ├── footprint.py    # rankings, intensity, lever quadrant, per-hectare, routing
-│   └── viz.py          # reusable plots
-├── outputs/            # exported charts/tables
-├── OtherDetails/       # track brief, notes, references
-├── requirements.txt
-├── .gitignore
-├── CLAUDE.md           # working notes / conventions for AI-assisted dev
-└── README.md
-```
-
-## Data
-
-Place the full FAOSTAT normalized CSVs in `data/raw/`:
-
-| File | Domain | Grain | Unit |
-|---|---|---|---|
-| `Emissions_totals.csv` | Emissions totals (GT) | Area × Element × Item × Source × Year | kt |
-| `Emissions_intensities.csv` | Emissions intensities (EI) | Area × Element × Item (CPC) × Year | kg CO2eq/kg |
-| `Land_Use.csv` | Land Use (RL) | Area × Element × Item × Year | 1000 ha |
-
-**Optional** (for `03_normalization.ipynb` — notebooks degrade gracefully if absent):
-
-| File | Domain | Element to use |
-|---|---|---|
-| `Population.csv` | Population → Annual population | Total Population - Both sexes |
-| `Food_Balances.csv` | Food Balances (2010–) | Food supply (kcal/capita/day) |
-
-Source: https://www.fao.org/faostat/en/#data — each domain's *Bulk Downloads → All Data
-Normalized*; use `..._E_All_Data_(Normalized).csv` (all areas). Files are large (~20MB+) and
-are git-ignored.
-
-## Run
-
-```bash
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-jupyter notebook notebooks/Sustain_EDA.ipynb
-```
-
-Run top to bottom. The notebook adds `..` to the path so `from src import ...` works.
-
-## What it produces
-
-- **Explore:** M49-filtered rankings of emission sources and countries → the high-impact footprint.
-- **Quantify:** source trends, emissions intensity by commodity, a volume-vs-intensity lever
-  quadrant, and emissions per hectare.
-- **Strategize (setup):** headline "what's causing more issue" (by volume and by intensity) and
-  the next FAOSTAT dataset to pull to prove the mechanism.
+---
 
 ## Key findings
 
-_Fill in after running:_
+From the executed run — **analysis year 2023**, element **`Emissions (CO2eq) (AR5)`** (both
+auto-selected and printed by the notebook, so they're verifiable rather than assumed):
 
-- Largest source by volume: …
-- Most emissions-intensive food per kg: …
-- Biggest lever (high volume + high intensity): …
-- Analysis year: …
+| | |
+|---|---|
+| **Largest agrifood source by volume** | **Pre- and post-production** — 16.7% of the ranked agrifood total. Food processing, transport, retail and waste, *not* the farm itself |
+| **Most emissions-intensive food per kg** | **Meat of cattle with the bone, fresh or chilled** |
+| **Biggest lever** (high volume × high intensity) | Cattle meat — where intensity and volume coincide |
+| **Next dataset to pull** | Emissions from pre- and post-agricultural production (Agrifood systems) — to prove the supply-chain mechanism |
 
-## Caveats
+**The finding worth arguing about:** the single largest agrifood emissions bucket sits *outside the
+farm gate*. That points a mitigation strategy at processing, transport, retail and waste rather
+than at production practice — which is also the part of the system a production-side dataset can't
+fully see. Hence the "next dataset" call.
 
-- **M49 aggregates** are filtered before any ranking (`clean.split_countries_aggregates`).
-- **Do not merge totals with intensities on item code** — different coding systems
-  (`Item Code` vs `Item Code (CPC)`); align on Area + Year.
-- Confirm the auto-selected CO2eq element and agricultural-land item (both print when run).
+> **Read the source rankings as a landscape, not a partition.** FAOSTAT mixes hierarchy levels in
+> `Item` — *Emissions from livestock* partly contains *Enteric Fermentation*; *Land-use change*
+> overlaps *Net Forest conversion*. Don't sum overlapping items as though they were mutually
+> exclusive. Rankings here are also scoped to **agrifood** sources: economy-wide Energy, IPPU
+> (industry) and Waste are excluded, since the track asks about the *food* footprint.
+
+---
+
+## Data
+
+Download each domain's *Bulk Downloads → All Data (Normalized)* from
+<https://www.fao.org/faostat/en/#data> and place the CSV in `data/raw/`. Files are large (~20 MB+
+each) and git-ignored.
+
+| File | Domain | Used for |
+|---|---|---|
+| `Emissions_Totals_E_All_Data.csv` | GT — Emissions totals | Source and country rankings; gas breakdown |
+| `Environment_Emissions_intensities_E_All_Data.csv` | EI — Emissions intensities | kg CO2eq per kg of commodity; the efficiency lever |
+| `Inputs_LandUse_E_All_Data.csv` | RL — Land use | Emissions per hectare; agricultural land base |
+| `Environment_LandCover_E_All_Data.csv` | LC — Land cover | Forest trend and change by country (nb 06) |
+| `Environment_Cropland_nutrient_budget_E_All_Data.csv` | ES — Cropland nutrient budget | Nutrient surplus (nb 06) |
+
+**Optional** — `03_normalization` degrades gracefully if these are absent:
+
+| File | Element to use |
+|---|---|
+| Population | `Total Population - Both sexes` |
+| Food Balances (2010–) | `Food supply (kcal/capita/day)` |
+
+`src/load.try_read` returns `None` with a clear message for anything missing, so a partial download
+still runs.
+
+> `Inputs_LandUse_E_All_Data.csv` is also read by **[`../indonesia-eda/`](../indonesia-eda/)** for
+> its cropping-intensity proxy — the one place the two tracks share data. Don't move or rename it
+> without checking there.
+
+---
+
+## Setup
+
+Uses the **shared root virtualenv** — there's no per-track requirements file.
+
+```bash
+cd ..
+python -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+python -m ipykernel install --user --name wid-datathon
+```
+
+---
+
+## Notebooks
+
+Committed **with outputs** — readable without running. `00` is the full narrative; `01`–`06` are
+the focused chapters.
+
+| # | Notebook | What it does |
+|---|---|---|
+| 00 | `00_Sustain_EDA` | **The whole story end to end** — explore → quantify → strategize. Start here |
+| 01 | `01_sources_and_countries` | Scoping: footprint, source and country rankings, levers |
+| 02 | `02_gases` | CH4 vs N2O vs CO2 — which gas actually drives the total |
+| 03 | `03_normalization` | Per-capita and per-calorie lenses *(needs the optional datasets)* |
+| 04 | `04_lever_gap` | Best- vs worst-in-class intensity — the signature metric |
+| 05 | `05_candidate_comparison` | Compare candidate angles, pick the project focus |
+| 06 | `06_land_and_planet` | Land composition, forest trend and change, nutrient surplus |
+
+Each notebook adds `..` to `sys.path`, so `from src import ...` works when run from `notebooks/`.
+
+> Charts render **inline in the notebooks**; `outputs/` is currently empty. Call `viz.save(fig,
+> name)` if you need a chart as a file for a deck.
+
+---
+
+## Code
+
+```
+src/
+├── load.py        read_faostat · try_read · load_all        (encoding-robust FAOSTAT readers)
+├── clean.py       split_countries_aggregates · pick_analysis_year · pick_co2eq_element
+│                  scope_agrifood · drop_aggregate_items · basic_report
+├── footprint.py   rank_sources · rank_countries · source_trends · commodity_intensity
+│                  lever_table · pick_lever_commodity · emissions_per_land · next_dataset
+│                  gas_breakdown · per_capita · intensity_gap · land_composition
+│                  forest_trend · forest_change_by_country · nutrient_surplus
+└── viz.py         barh_ranking · line_trends · lever_quadrant
+```
+
+The pipeline runs in one direction: **`load` → `clean` → `footprint` → `viz`.** Analysis logic
+lives in `src/` where it's importable and testable; notebooks orchestrate and narrate.
+
+---
+
+## Data gotchas
+
+These have all bitten. `CLAUDE.md` has the working notes.
+
+- **M49 aggregates hide among countries.** `Area` mixes real countries with World, regions and
+  income groups. Always run `clean.split_countries_aggregates` and rank on the countries frame.
+- **Two item-coding systems.** Emissions *totals* use `Item Code`; emissions *intensities* use
+  `Item Code (CPC)`. **Never join on item code** — align on `Area` + `Year` and match by name.
+- **CO2eq comparability.** Totals span several gases. Pick a CO2eq element
+  (`clean.pick_co2eq_element`) before summing across sources, and confirm which one was selected —
+  auto-selection can land on a single-gas element.
+- **Recent years are partial.** `clean.pick_analysis_year` takes the latest year at ≥90% of peak
+  country coverage, rather than the newest year present.
+- **Flags.** `Flag Description` separates estimated from official values. In the intensities data,
+  estimated values *outnumber* official ones roughly 6:1 — worth stating whenever you quote one.
+
+---
+
+## Layout
+
+```
+notebooks/        00–06, committed with outputs
+src/              load → clean → footprint → viz
+data/raw/         FAOSTAT bulk CSVs (git-ignored, you download these)
+data/processed/   derived tables
+outputs/          exported charts and tables (currently empty — figures render inline)
+CLAUDE.md         conventions and gotchas — read before touching the data
+```
+
+---
+
+## Open items
+
+- Confirm the auto-selected CO2eq element name against FAOSTAT documentation.
+- Per-capita and per-GDP normalisation as an alternative lens (started in `03`, needs the optional
+  Population and Food Balances downloads).
+- For the chosen lever commodity, size best-in-class against worst-in-class intensity to quantify
+  the achievable reduction — that's the number a strategy recommendation would rest on.
