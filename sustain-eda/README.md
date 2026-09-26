@@ -27,11 +27,9 @@ farm gate*. That points a mitigation strategy at processing, transport, retail a
 than at production practice — which is also the part of the system a production-side dataset can't
 fully see. Hence the "next dataset" call.
 
-> **Read the source rankings as a landscape, not a partition.** FAOSTAT mixes hierarchy levels in
-> `Item` — *Emissions from livestock* partly contains *Enteric Fermentation*; *Land-use change*
-> overlaps *Net Forest conversion*. Don't sum overlapping items as though they were mutually
-> exclusive. Rankings here are also scoped to **agrifood** sources: economy-wide Energy, IPPU
-> (industry) and Waste are excluded, since the track asks about the *food* footprint.
+**Scope of these rankings:** they cover **agrifood** sources only — economy-wide Energy, IPPU
+(industry) and Waste are excluded, since the track asks about the *food* footprint. That is what
+"% of the ranked agrifood total" above is a share of.
 
 ---
 

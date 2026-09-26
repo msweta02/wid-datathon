@@ -25,7 +25,14 @@ set up a mitigation strategy that doesn't cut output.
   (`clean.pick_co2eq_element`) before summing across sources.
 - **Coverage**: recent years are partial; `clean.pick_analysis_year` picks the latest year at
   >=90% of peak country coverage.
-- **Flags**: `Flag Description` marks estimated vs official values — worth reporting.
+- **Flags**: `Flag Description` marks estimated vs official values — worth reporting. In the
+  intensities data, estimated values outnumber official ones roughly 6:1.
+- **`Item` mixes hierarchy levels — don't sum it like a partition.** *Emissions from livestock*
+  partly contains *Enteric Fermentation*; *Land-use change* overlaps *Net Forest conversion*.
+  Read the source rankings as a landscape; adding overlapping items double-counts.
+- **Agrifood scoping**: rankings use `footprint.scope_agrifood`, which drops economy-wide Energy,
+  IPPU and Waste. The track asks about the *food* footprint, so any "% of total" is a share of the
+  agrifood subset, not of national emissions — say which whenever you quote one.
 
 ## Open items
 
