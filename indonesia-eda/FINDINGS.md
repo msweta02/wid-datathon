@@ -283,7 +283,7 @@ cannot reduce the 12.3 Mt Indonesia must buy; cassava → MOCAF reduces the volu
   `$0.29bn` and `$0.25–0.34bn` figures derived from it, the `40,000 kg/ha` frontier placeholder, the
   `41`-peer count, and `14.4%`. Each entry records *what it was, what replaced it, and where it is
   intentionally allowed* — so an allowlist entry is a documented decision, not a silent exception.
-  **Run it before anything goes on a slide.** It has already caught two real survivors (§5.6). Docs are
+  **Run it before anything goes on a slide.** It has already caught two real survivors (§5.5). Docs are
   excluded by default: they quote retired values by design.
 
 **Deck copy** (`outputs/`)
@@ -336,7 +336,11 @@ Asset `outputs/figures/idn_slide8_blend_and_savings.png` (2872×1342, 200 dpi): 
 
 ---
 
-## 5. Corrections made to pre-existing work
+## 5. Corrections — what changed, and why a number may differ from an older draft
+
+**Why this section exists:** several figures here were revised mid-analysis, so numbers in earlier
+deck drafts are superseded. Without this map, anyone comparing the two has no way to tell which is
+right. It is also what stops a retired value being reinstated from memory.
 
 1. **Placeholder yield frontier** (nb 05) — 40,000 kg/ha hardcoded → real peer frontier 35,574
    (India), with a ≥50k ha peer-scale filter. Changed the conclusion (see §2.5).
@@ -345,22 +349,20 @@ Asset `outputs/figures/idn_slide8_blend_and_savings.png` (2872×1342, 200 dpi): 
 3. **Unit mixing in the tonnage ranking** (nb 02, nb 04) — `Production` reports crops in `t` but
    eggs in `1000 No`. Grouping by `Item` alone summed 146bn eggs with 6.6 Mt and ranked
    **hen eggs as Indonesia's #2 "crop" by production**. Fixed via `clean.tonnes_only`.
-4. **Two `''`-in-f-string bugs** (nb 05) — terminated the f-string early, printing literal
-   `{cur_area:,.0f}` instead of the value.
-5. **Unsourced wheat price** (nb 05 §6) — `$300/t` "CIF assumption" plus a hand-picked
+4. **Unsourced wheat price** (nb 05 §6) — `$300/t` "CIF assumption" plus a hand-picked
    `[250, 300, 350]` band, replaced in E3 by the observed Pink Sheet series (§2.5a). The assumption sat
    at the **70th percentile** of real history, so it was **inflating** the savings, not being cautious.
-6. **Retired price figures that survived E3** — E3 fixed nb 05 §6 but left stale copies elsewhere:
+5. **Retired price figures that survived E3** — E3 fixed nb 05 §6 but left stale copies elsewhere:
    nb 04 §3 still read *"~$0.29bn/yr at $300/t"* and still listed the price as an open gap, and
    **nb 05's own §7** still carried *"~$0.25–0.34bn/yr ($250–350/t)"* plus a `$300/t CIF assumption`
    caveat. All updated to the sourced figure **with the FOB basis label attached**. Found by
    `tools/check_stale_numbers.py`, not by re-reading — which is the argument for having it.
-7. **Inconsistent blend upper bound** — nb 04 said `8.3–14.4%` where nb 05 computes `14.35% → 14.3%`
+6. **Inconsistent blend upper bound** — nb 04 said `8.3–14.4%` where nb 05 computes `14.35% → 14.3%`
    and both other docs said 14.3%. Aligned to **14.3%**.
-8. **Mathtext-mangled figure footnote** (nb 05 slide-8 asset) — matplotlib parses paired `$` as
-   mathtext, so an unescaped currency footnote silently italicised and ate its own spacing; literal
-   `**bold**` markdown also rendered as asterisks. Currency is now spelled `USD` inside long figure
-   strings. Recorded in `CLAUDE.md`.
+*Also fixed, code rather than numbers (no figure changed):* two `''`-in-f-string bugs in nb 05 that
+printed a literal `{cur_area:,.0f}`, and a matplotlib mathtext clash where paired `$` in a figure
+footnote silently italicised the text — currency is now spelled `USD` inside long figure strings.
+Both are recorded as gotchas in `CLAUDE.md`.
 
 ---
 

@@ -11,8 +11,7 @@ The brief spans four tracks — **GROW** (production), **TRADE** (flows), **EAT*
 | **GROW** — country deep-dive | [`indonesia-eda/`](indonesia-eda/) | Indonesia imports more wheat than anyone and grows none. Can cassava close the gap? | **Primary deliverable** |
 | **SUSTAIN** | [`sustain-eda/`](sustain-eda/) | What is the environmental footprint of how we feed ourselves? | Scoping EDA complete |
 
-TRADE and EAT were built by other track members outside this repo; only their decks appear here
-(under the git-ignored `Docs/`).
+TRADE and EAT were built by other track members outside this repo.
 
 ---
 
@@ -102,7 +101,6 @@ jupyter lab            # then run a track's notebooks in numeric order
 grow-eda/         GROW global scan        — 8 notebooks, 24 figures
 indonesia-eda/    GROW country deep-dive  — 7 notebooks, 24 figures, 3 tables, deck assets
 sustain-eda/      SUSTAIN scoping EDA     — 7 notebooks
-Docs/             decks and briefs (git-ignored)
 requirements.txt  shared dependencies
 ```
 
@@ -133,17 +131,17 @@ first run is slow.
 3. **[`grow-eda/README.md`](grow-eda/README.md)** — the scan that chose the focus.
 4. **[`sustain-eda/README.md`](sustain-eda/README.md)** — the SUSTAIN track.
 
-## A note on how this repo treats its own numbers
+## Before quoting a number
 
-Several figures here were **corrected mid-analysis**, and the corrections are documented rather
-than quietly overwritten — a placeholder yield frontier that overstated the opportunity, an
-unsourced wheat price that sat at the 70th percentile of real history, a unit mix-up that ranked
-hen eggs as Indonesia's #2 crop. `indonesia-eda/FINDINGS.md` §5 lists them all.
+Some figures were revised during the analysis, so **earlier deck drafts carry superseded values**.
+`indonesia-eda/FINDINGS.md` §5 maps each old number to its replacement, and:
 
-That track also carries `tools/check_stale_numbers.py`, a pre-flight guard that fails if a retired
-number survives anywhere in the notebooks. It exists because a corrected figure is only actually
-fixed if every copy of it is — and it has already caught two that weren't.
+```bash
+cd indonesia-eda && python tools/check_stale_numbers.py
+```
 
-Where the data cannot answer something, the notebooks say so instead of estimating: FAOSTAT is
-national-only and annual, this repo holds no trade-flow data, and two external sources we wanted
-were unreachable. Those limits are named in each track's README and in `FINDINGS.md` §6.
+fails if a retired number has survived anywhere in the notebooks.
+
+Where the data cannot answer something, the notebooks say so rather than estimating — FAOSTAT is
+national-only and annual, and this repo holds no trade-flow data. Limits are named in each track's
+README and in `FINDINGS.md` §6.
